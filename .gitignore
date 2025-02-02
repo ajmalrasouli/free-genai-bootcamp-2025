@@ -1,0 +1,83 @@
+# General Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+*.egg
+
+# Virtual Environment
+pip-log.txt
+pip-delete-this-directory.txt
+*.venv
+
+# Flask-Specific
+instance/
+*.sqlite
+*.db
+*.log
+
+# Jupyter Notebooks (if using for AI development)
+.ipynb_checkpoints/
+
+# Data Files
+data/
+*.csv
+*.json
+*.xml
+*.yaml
+*.h5
+*.pkl
+*.sqlite
+*.db
+
+# AI Model Files
+*.ckpt
+*.h5
+*.pth
+*.onnx
+*.tflite
+*.joblib
+*.pkl
+models/
+checkpoints/
+
+# TensorBoard Logs
+logs/
+tensorboard_logs/
+
+# Hugging Face & PyTorch Cache
+.cache/
+*.huggingface/
+*.transformers/
+*.torch/
+*.datasets/
+
+# Node.js / React
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+*.env
+build/
+dist/
+.DS_Store
+
+# Large Files
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.rar
+*.bz2
+
+# Git LFS (Optional for large files)
+*.mp4
+*.avi
+*.png
+*.jpg
+*.jpeg
+*.gif
