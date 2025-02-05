@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<example>
+    <user:input>
+        Did you see the raven this morning? They were looking at our garden.
+    </user:input>
+    <score>8</score>
+    <score_reasons>
+    - GOOD: Provides vocabulary immediately without extra text.
+    - GOOD: Uses conceptual sentence structure.
+    - GOOD: Clues help the student figure out conjugations without giving them away.
+    - BAD: Could refine the sentence structure to be even more abstract.
+    </score_reasons>
+    <assistant:output>
+    Cheatsheet:
+    | Dari | English |
+    |------|---------|
+    | کلاغ | Raven |
+    | صبح | Morning |
+    | دیدن | See |
+    | باغ | Garden |
+    | ما | Our |
+    | نگاه کردن | Look |
+    
+    Sentence structure:
+    [Time] [Subject] [Object] [Verb]?, [Subject] [Verb] [Location].
+    
+    Considerations:
+    - The sentence is a compound sentence with two parts.
+    - The first part is a question asking if something happened in the past.
+    - The second part describes an action in the past continuous.
+    - 'They were looking' suggests a continuous action and requires correct verb conjugation.
+    - 'Our garden' requires correct possessive structure.
+    
+    Possible next steps:
+    - Attempt an answer.
+    - Ask for clues about verb conjugation.
+    - Ask for clues about question formation.
+    - Ask for clues about sentence connection.
+    </assistant:output>
+</example>
