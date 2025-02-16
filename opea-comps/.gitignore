@@ -1,0 +1,26 @@
+# Ignore Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment
+venv/
+
+# Ignore environment files
+.env
+
+# Ignore logs and temporary files
+logs/
+*.log
+*.tmp
+
+# Ignore Docker-related files
+docker-compose.override.yml
+
+# Ignore audio outputs
+*.wav
+*.mp3
+
+# Ignore model files
+models/
