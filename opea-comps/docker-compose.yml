@@ -2,17 +2,36 @@ version: '3.8'
 
 services:
   tts-service:
-    image: ghcr.io/coqui-ai/tts:latest
+    image: ghcr.io/coqui-ai/tts-cpu:latest
     container_name: tts-microservice
     ports:
-      - "5002:5002"
+      - "5005:5002"
     volumes:
       - ./models:/root/.local/share/tts
     environment:
       - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
-    command: ["--model_name", "tts_models/en/ljspeech/tacotron2-DDC"]
+    # Updated command with only supported arguments
+    entrypoint: [ "python3", "-m", "TTS.server.server" ]
+    command: [ "--port", "5002", "--model_name", "tts_models/en/ljspeech/tacotron2-DDC", "--use_cuda", "false" ]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
     restart: unless-stopped
+    networks:
+      - app-network
+
+  mega-service:
+    build: ./mega-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - tts-service
+    networks:
+      - app-network
 
 networks:
-  default:
+  app-network:
     driver: bridge

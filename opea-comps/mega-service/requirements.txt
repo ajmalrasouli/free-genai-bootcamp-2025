@@ -1,3 +1,5 @@
 fastapi
 requests
 uvicorn
+pydub
+python-multipart
