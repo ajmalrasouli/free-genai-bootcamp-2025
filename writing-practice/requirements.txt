@@ -1,4 +1,7 @@
-streamlit==1.30.0
-Pillow==9.5.0
-manga-ocr==0.1.8
-openai==1.10.0
+gradio>=4.0.0
+pytesseract>=0.3.10
+Pillow>=10.0.0
+arabic-reshaper>=3.0.0
+python-bidi>=0.4.2
+PyYAML>=6.0.1
+python-dotenv>=1.0.0

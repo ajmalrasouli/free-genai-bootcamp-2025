@@ -1,0 +1,38 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Build and Dependency Directories
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Log Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Files
+.env
+.env.local
+.env.*.local
+
+# Package Files
+*.tar.gz
+*.zip
+*.rar

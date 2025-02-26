@@ -1,46 +1,38 @@
-# Language Writing Practice
+# Farsi Writing Practice App
 
-A Streamlit-based application for practicing writing in Persian (Farsi) or other languages. The app generates simple English sentences and allows users to practice writing them in their target language.
+A simple and interactive application to help users practice writing in Farsi (Persian). The app provides English sentences and verifies your handwritten Farsi translations using OCR technology.
 
 ## Features
 
-- 🎯 Generate simple, grammatically correct English sentences
-- 📝 Practice writing translations in Persian/Farsi
-- 📸 Upload images of your handwritten text
-- 🔍 OCR support for Persian text recognition
-- 🎨 RTL (Right-to-Left) text display support
-- 💡 Instant feedback on your writing
+- Random English sentences for translation practice
+- Upload and verify handwritten Farsi text
+- Real-time OCR processing with Tesseract
+- Immediate feedback on translation accuracy
+- Proper RTL (Right-to-Left) text display
+- Support for Persian character variations
 
-## Installation
+## Prerequisites
 
-### Prerequisites
-
-1. Python 3.8 or higher
+1. Python 3.7 or higher
 2. Tesseract-OCR with Persian language support
 
 ### Installing Tesseract-OCR
 
-1. Download the installer from [UB-Mannheim/tesseract](https://github.com/UB-Mannheim/tesseract/wiki)
+1. Download Tesseract installer from: https://github.com/UB-Mannheim/tesseract/wiki
 2. During installation:
    - Select "Persian" language pack
    - Install to the default location (C:\Program Files\Tesseract-OCR)
+3. Restart the application after installation
 
-### Setting up the Project
+## Installation
 
-1. Clone the repository:
+1. Clone this repository:
 ```bash
-git clone <repository-url>
+git clone [repository-url]
 cd writing-practice
 ```
 
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Unix/macOS
-.\venv\Scripts\activate   # On Windows
-```
-
-3. Install required packages:
+2. Install required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
@@ -49,73 +41,66 @@ pip install -r requirements.txt
 
 1. Start the application:
 ```bash
-streamlit run app.py
+python gradio_app.py
 ```
 
-2. Open your web browser and navigate to:
-```
-http://localhost:8501
-```
+2. The web interface will open in your browser
 
-3. Using the app:
-   - Click "Generate New Sentence" to get an English sentence
-   - Write the sentence in Persian/Farsi
+3. Practice writing:
+   - Click "Get New Sentence" to receive an English sentence
+   - Write the Farsi translation on paper
    - Take a photo or scan your writing
-   - Upload the image to check your writing
+   - Upload the image
+   - Click "Submit" to verify your translation
 
-## Technical Details
+4. View Results:
+   - Your written text will be displayed with proper RTL formatting
+   - You'll see if your translation is correct or incorrect
+   - If incorrect, the expected translation will be shown
 
-### Components
+## Supported Translations
 
-- **Frontend**: Streamlit
-- **Image Processing**: Pillow (PIL)
-- **OCR Engine**: Tesseract with Persian language support
-- **Text Direction**: RTL support for Persian text
-
-### Dependencies
-
-- streamlit
-- pillow
-- pytesseract
-- python-dotenv
-- openai (for future features)
+The app currently supports common phrases including:
+- Welcome (خوش آمدید)
+- Hello (سلام)
+- Good morning (صبح بخیر)
+- Good night (شب بخیر)
+- Thank you (متشکرم)
+- You're welcome (خواهش می‌کنم)
+- How are you? (حال شما چطور است؟)
+- I am fine (من خوب هستم)
+- What is your name? (اسم شما چیست؟)
+- Nice to meet you (از آشنایی با شما خوشحالم)
 
 ## Troubleshooting
 
-### Common Issues
+If you encounter issues:
 
-1. **Tesseract Not Found**
-   - Ensure Tesseract is installed in the default location
-   - Check if the Persian language pack is installed
+1. **Text Not Detected**:
+   - Ensure your writing is clear and well-lit
+   - Use dark ink on white paper
+   - Make sure the image is focused
 
-2. **OCR Not Working**
-   - Make sure your image is clear and well-lit
-   - Text should be written clearly in black ink
-   - Background should be white and clean
+2. **Incorrect Recognition**:
+   - Check the debug output to see what text was detected
+   - Ensure Tesseract is properly installed with Persian support
+   - Try writing more clearly or adjusting the image quality
 
-3. **Text Not Displaying Correctly**
-   - Ensure your browser supports RTL text
-   - Check if Persian fonts are installed
+3. **Installation Issues**:
+   - Verify Tesseract is installed in the default location
+   - Ensure the Persian language pack is installed
+   - Check if all required Python packages are installed
+
+## Dependencies
+
+- gradio
+- pytesseract
+- Pillow
+- arabic-reshaper
+- python-bidi
+- PyYAML
+- logging
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Tesseract OCR team for Persian language support
-- Streamlit team for the amazing framework
-- Contributors and testers
-
-## Future Plans
-
-- [ ] Add support for more languages
-- [ ] Implement handwriting feedback
-- [ ] Add progress tracking
-- [ ] Integrate with language learning APIs
-- [ ] Add pronunciation guides
-
+Feel free to submit issues, fork the repository, and create pull requests for any improvements.
