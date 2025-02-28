@@ -41,13 +41,13 @@ class ASLFingerSpellingApp:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             
             # Apply Gaussian blur
-            blurred = cv2.GaussianBlur(gray, (7, 7), 0)
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)  # Reduced kernel size
             
-            # Apply adaptive thresholding
+            # Apply adaptive thresholding with adjusted parameters
             thresh = cv2.adaptiveThreshold(
                 blurred, 255,
                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                cv2.THRESH_BINARY_INV, 11, 2
+                cv2.THRESH_BINARY_INV, 15, 5  # Adjusted block size and C
             )
             
             # Find contours
@@ -60,42 +60,51 @@ class ASLFingerSpellingApp:
             # Find the largest contour (presumably the hand)
             if contours:
                 max_contour = max(contours, key=cv2.contourArea)
+                area = cv2.contourArea(max_contour)
                 
-                # Extract features and predict letter
-                features = extract_hand_features(max_contour)
-                predicted_letter, confidence = predict_letter(features)
-                
-                # Draw analysis visualization
-                frame = draw_hand_analysis(frame, max_contour)
-                
-                # Draw processed threshold image
-                thresh_rgb = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
-                debug_image = np.vstack([frame, thresh_rgb])
-                
-                # Add confidence text if letter was predicted
-                if predicted_letter:
-                    cv2.putText(
-                        debug_image,
-                        f"Predicted: {predicted_letter} ({confidence:.2f})",
-                        (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
-                        (0, 255, 0),
-                        2
-                    )
+                # Check if contour is large enough to be a hand
+                min_area = frame.shape[0] * frame.shape[1] * 0.02  # 2% of frame area
+                if area > min_area:
+                    # Extract features and predict letter
+                    features = extract_hand_features(max_contour)
+                    predicted_letter, confidence = predict_letter(features)
                     
-                    # Add debug info
-                    cv2.putText(debug_image, f"Features: {features.round(2)}", (10, 60),
-                               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0), 2)
+                    # Draw analysis visualization
+                    frame = draw_hand_analysis(frame, max_contour)
                     
-                    # Get reference image HTML
-                    ref_html = get_reference_image_html(predicted_letter)
+                    # Draw processed threshold image
+                    thresh_rgb = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+                    debug_image = np.vstack([frame, thresh_rgb])
+                    
+                    # Add confidence text if letter was predicted
+                    if predicted_letter:
+                        cv2.putText(
+                            debug_image,
+                            f"Predicted: {predicted_letter} ({confidence:.2f})",
+                            (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (0, 255, 0),
+                            2
+                        )
+                        
+                        # Add debug info
+                        cv2.putText(debug_image, f"Features: {features.round(2)}", (10, 60),
+                                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0), 2)
+                        
+                        # Get reference image HTML
+                        ref_html = get_reference_image_html(predicted_letter)
+                    else:
+                        predicted_letter = None
+                        ref_html = ""
                 else:
                     predicted_letter = None
+                    debug_image = frame.copy()
+                    logging.debug(f"Contour too small: {area:.2f} < {min_area:.2f}")
                     ref_html = ""
-                
             else:
                 predicted_letter = None
+                debug_image = frame.copy()
                 ref_html = ""
             
             # Convert back to RGB for display
@@ -191,6 +200,22 @@ def create_ui():
         
         with gr.Tab("Reference Guide"):
             gr.HTML(get_all_reference_images_html())
+            
+        with gr.Tab("Help & Troubleshooting"):
+            gr.Markdown("""
+            ## Common Issues & Solutions
+            
+            ### Hand Detection Problems
+            - **Position your hand closer to the camera** - Your hand should occupy at least 2% of the frame
+            - **Use good lighting** - Ensure your hand is well-lit without harsh shadows
+            - **Use a plain background** - Complex backgrounds can confuse the detection
+            - **Hold your hand still** - Rapid movements can be difficult to detect
+            
+            ### Performance Issues
+            - If the app runs slowly, try closing other applications
+            - For memory errors, reduce your camera resolution
+            - Make sure you have updated graphics drivers
+            """)
         
         with gr.Tab("Practice Mode"):
             gr.Markdown("Practice ASL finger spelling - show your hand to the camera")
@@ -198,15 +223,14 @@ def create_ui():
                 with gr.Column():
                     practice_input = gr.Image(sources=["webcam"], streaming=True)
                     practice_text = gr.Textbox(label="Detection Result")
+                    practice_ref = gr.HTML(label="Reference")
                 with gr.Column():
                     practice_output = gr.Image()
-                    practice_reference = gr.HTML()
             
-            practice_input.change(
-                fn=app.practice_mode,
+            practice_input.stream(
+                app.practice_mode,
                 inputs=practice_input,
-                outputs=[practice_output, practice_text, practice_reference],
-                show_progress=False
+                outputs=[practice_input, practice_text, practice_ref]
             )
         
         with gr.Tab("Test Mode"):

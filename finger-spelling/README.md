@@ -76,11 +76,24 @@ The application recognizes all 26 letters of the ASL alphabet (A-Z).
    - Ensure good lighting conditions
    - Keep hand within the marked area
    - Make gestures clear and precise
+   - Position your hand closer to the camera
+   - Make sure your hand occupies at least 2% of the frame
+   - Try using a plain background for better contrast
 
 3. **Performance Issues**:
    - Close unnecessary background applications
    - Check system requirements
    - Update graphics drivers if needed
+   - If you experience memory errors, reduce camera resolution in settings
+   - The application now includes optimizations for better memory management
+   - For slow systems, try limiting the frame rate
+
+## Recent Updates
+
+- Improved hand detection with adaptive thresholding
+- Added minimum contour size validation (hand must be large enough)
+- Optimized memory usage and added error handling
+- Reduced frame dimensions for better performance
 
 ## Contributing
 
