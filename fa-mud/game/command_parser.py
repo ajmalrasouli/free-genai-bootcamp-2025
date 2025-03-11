@@ -1,6 +1,11 @@
 """Command parser for Farsi MUD game."""
 import re
 from typing import Dict, Optional, Tuple
+import hazm
+import arabic_reshaper
+from bidi.algorithm import get_display
+
+from .models import Room, Player
 
 class CommandParser:
     """Parses and validates user commands."""
@@ -11,6 +16,8 @@ class CommandParser:
     }
     
     def __init__(self):
+        """Initialize command parser."""
+        self.normalizer = hazm.Normalizer()
         # Command pattern: verb + target [+ preposition + recipient]
         self.command_pattern = re.compile(
             r'^(?P<verb>\w+)\s+(?P<target>\S+)(?:\s+(on|to)\s+(?P<recipient>\S+))?$'
@@ -42,13 +49,19 @@ class CommandParser:
         if components['verb'] not in self.VALID_VERBS:
             return None
             
+        # Process Farsi text in target and recipient
+        if components.get('target'):
+            components['target'] = self._process_farsi_text(components['target'])
+        if components.get('recipient'):
+            components['recipient'] = self._process_farsi_text(components['recipient'])
+            
         return components
     
     def validate_command_context(
         self,
         components: Dict[str, str],
-        current_room: 'Room',
-        player: 'Player'
+        current_room: Room,
+        player: Player
     ) -> Tuple[bool, str]:
         """Validate command in game context.
         
@@ -71,7 +84,7 @@ class CommandParser:
         # Validate target exists
         if verb == 'look':
             if target and target not in current_room.get_visible_objects():
-                return False, f"You don't see any {target} here."
+                return False, f"You don't see any **{target}** here."
             return True, ""
             
         # Validate movement
@@ -83,35 +96,43 @@ class CommandParser:
         # Validate item interactions
         if verb in {'take', 'drop', 'use', 'give'}:
             if verb == 'take':
-                if target not in current_room.items:
-                    return False, f"There is no {target} here."
+                if not any(i.name_fa == target for i in current_room.items):
+                    return False, f"There is no **{target}** here."
             elif verb == 'drop':
-                if target not in player.inventory:
-                    return False, f"You don't have {target}."
+                if not any(i.name_fa == target for i in player.inventory):
+                    return False, f"You don't have **{target}**."
             elif verb == 'use':
-                if target not in player.inventory:
-                    return False, f"You don't have {target}."
-                if recipient and recipient not in current_room.get_usable_objects():
-                    return False, f"You can't use that on {recipient}."
+                if not any(i.name_fa == target for i in player.inventory):
+                    return False, f"You don't have **{target}**."
+                if recipient and not any(i.name_fa == recipient and i.is_usable for i in current_room.items):
+                    return False, f"You can't use that on **{recipient}**."
             elif verb == 'give':
-                if target not in player.inventory:
-                    return False, f"You don't have {target}."
-                if recipient not in current_room.npcs:
-                    return False, f"There is no {recipient} here."
+                if not any(i.name_fa == target for i in player.inventory):
+                    return False, f"You don't have **{target}**."
+                if not any(n.name_fa == recipient for n in current_room.npcs):
+                    return False, f"There is no **{recipient}** here."
                     
         # Validate object interactions
         if verb in {'open', 'close'}:
-            if target not in current_room.get_interactable_objects():
-                return False, f"You can't {verb} that."
+            if not any(i.name_fa == target and not i.is_portable for i in current_room.items):
+                return False, f"You can't {verb} **{target}**."
                 
         # Validate consumption
         if verb in {'eat', 'drink'}:
-            if target not in player.inventory:
-                return False, f"You don't have {target}."
             item = player.get_item(target)
+            if not item:
+                return False, f"You don't have **{target}**."
             if verb == 'eat' and not item.is_edible:
-                return False, f"You can't eat that."
+                return False, f"You can't eat **{target}**."
             if verb == 'drink' and not item.is_drinkable:
-                return False, f"You can't drink that."
+                return False, f"You can't drink **{target}**."
                 
         return True, ""
+        
+    def _process_farsi_text(self, text: str) -> str:
+        """Process Farsi text for proper RTL display."""
+        # Normalize and reshape Farsi text
+        normalized = self.normalizer.normalize(text)
+        reshaped = arabic_reshaper.reshape(normalized)
+        # Add RTL mark
+        return f"\u200F{reshaped}"

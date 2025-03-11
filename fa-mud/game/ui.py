@@ -1,61 +1,71 @@
 """Terminal UI for Farsi MUD using Textual."""
+from typing import List
+import hazm
+import arabic_reshaper
+from bidi.algorithm import get_display
 from textual.app import App, ComposeResult
 from textual.containers import Container, ScrollableContainer
-from textual.widgets import Input, Label, RichLog
-from textual.binding import Binding
-from textual.reactive import reactive
-from rich.text import Text
-import re
-
-from .engine import GameEngine
-from .vocabulary_loader import VocabularyLoader
-
-def format_rtl_text(text: str) -> str:
-    """Format text with proper RTL support for Farsi words."""
-    # Match Farsi words between ** markers
-    pattern = r'\*\*([\u0600-\u06FF\s]+)\*\*'
-    
-    # Join Farsi characters with zero-width non-joiner
-    def join_farsi(match):
-        word = match.group(1)
-        # Add RTL mark before and LTR mark after
-        return f"\u200F{word}\u200E"
-    
-    return re.sub(pattern, join_farsi, text)
-
-class GameDisplay(ScrollableContainer):
-    """Main game display area."""
-    
-    def compose(self) -> ComposeResult:
-        """Create child widgets."""
-        yield RichLog(wrap=True, markup=True)
-        
-    def write(self, text: str) -> None:
-        """Write text to the display with RTL support."""
-        formatted_text = format_rtl_text(text)
-        # Create styled text with proper RTL support
-        styled_text = Text()
-        
-        # Split on ** markers to handle Farsi and non-Farsi text
-        parts = re.split(r'(\u200F[\u0600-\u06FF\s]+\u200E)', formatted_text)
-        for part in parts:
-            if part.startswith('\u200F') and part.endswith('\u200E'):
-                # Farsi text - add with bold style
-                styled_text.append(part[1:-1], style="bold")
-            else:
-                # Non-Farsi text - add as is
-                styled_text.append(part)
-        
-        self.query_one(RichLog).write(styled_text)
+from textual.widgets import Input, RichLog, Static
 
 class CommandInput(Input):
     """Command input with history."""
     
+    DEFAULT_CSS = """
+    CommandInput {
+        background: $surface-lighten-2;
+        color: $text;
+        padding: 0 1;
+        border: none;
+        height: 1;
+        content-align: right middle;
+        text-align: right;
+        dir: rtl;
+    }
+    
+    CommandInput:focus {
+        border: tall $accent;
+    }
+    """
+    
     def __init__(self):
-        super().__init__(placeholder="Enter command...")
+        # Process placeholder text for RTL
+        farsi_text = "دستور را وارد کنید"
+        normalized = hazm.Normalizer().normalize(farsi_text)
+        reshaped = arabic_reshaper.reshape(normalized)
+        bidi_text = get_display(reshaped)
+        placeholder = f"\u200F{bidi_text}"  # Add RTL mark before Farsi text
+        
+        super().__init__(placeholder=placeholder)
         self.history: list[str] = []
         self.history_index = 0
+        self.normalizer = hazm.Normalizer()
         
+    def _process_farsi_text(self, text: str) -> str:
+        """Process Farsi text for proper RTL display."""
+        if not text:
+            return text
+            
+        # Split text into words
+        words = text.split()
+        processed_words = []
+        
+        for word in words:
+            # Check if word contains Farsi characters
+            if any('\u0600' <= c <= '\u06FF' for c in word):
+                # Process Farsi word
+                normalized = self.normalizer.normalize(word)
+                reshaped = arabic_reshaper.reshape(normalized)
+                bidi_text = get_display(reshaped)
+                processed_words.append(f"\u200F{bidi_text}")
+            else:
+                processed_words.append(word)
+        
+        # Join words and ensure RTL for mixed text
+        processed_text = " ".join(processed_words)
+        if any('\u0600' <= c <= '\u06FF' for c in processed_text):
+            return f"\u200F{processed_text}"
+        return processed_text
+    
     def on_key(self, event) -> None:
         """Handle key events for command history."""
         if event.key == "up":
@@ -69,94 +79,129 @@ class CommandInput(Input):
             else:
                 self.history_index = len(self.history)
                 self.value = ""
+    
+    def _on_change(self, value: str) -> None:
+        """Handle input changes to process Farsi text."""
+        # Process the text for RTL display
+        processed_text = self._process_farsi_text(value)
+        # Only update if the processed text is different
+        if processed_text != value:
+            self.value = processed_text
+        super()._on_change(processed_text)
+
+class GameLog(RichLog):
+    """Game output display widget."""
+    
+    DEFAULT_CSS = """
+    GameLog {
+        background: $surface;
+        color: $text;
+        border: solid $primary;
+        height: 1fr;
+        margin: 0 1;
+        padding: 0 1;
+        border-title-align: center;
+        border-title-color: $accent;
+        border-title-background: $primary;
+        border-subtitle-align: center;
+        text-align: right;
+    }
+    """
+    
+    def __init__(self):
+        super().__init__()
+        self.normalizer = hazm.Normalizer()
+        
+    def write_game_text(self, text: str) -> None:
+        """Write text to display with proper RTL support."""
+        if not text:
+            return
+            
+        # Process each line separately
+        lines = text.split('\n')
+        processed_lines = []
+        
+        for line in lines:
+            # Find Farsi words between ** markers
+            words = line.split()
+            processed_words = []
+            
+            for word in words:
+                if word.startswith('**') and word.endswith('**'):
+                    # Process Farsi word
+                    farsi = word[2:-2]
+                    normalized = self.normalizer.normalize(farsi)
+                    reshaped = arabic_reshaper.reshape(normalized)
+                    bidi_text = get_display(reshaped)
+                    processed_words.append(f"**\u200F{bidi_text}**")
+                else:
+                    processed_words.append(word)
+            
+            processed_line = " ".join(processed_words)
+            # Add RTL mark if line contains Farsi
+            if any('\u0600' <= c <= '\u06FF' for c in processed_line):
+                processed_line = f"\u200F{processed_line}"
+            processed_lines.append(processed_line)
+        
+        # Write processed text
+        self.write("\n".join(processed_lines))
 
 class GameUI(App):
     """Main game UI application."""
     
     CSS = """
-    GameDisplay {
-        height: 1fr;
-        border: solid green;
+    Screen {
+        layout: grid;
+        grid-size: 1;
+        grid-rows: 1fr auto;
         background: $surface;
-        padding: 1;
-        color: $text;
     }
     
-    CommandInput {
-        dock: bottom;
-        border: solid green;
+    GameLog {
+        width: 100%;
+        height: 100%;
+    }
+    
+    #input-container {
+        height: auto;
         background: $surface-lighten-2;
-        color: $text;
-    }
-    
-    Label {
-        padding: 1;
-        color: $text;
-        text-align: center;
-        background: $primary;
+        border-top: solid $primary;
+        padding: 0 1;
     }
     """
     
-    BINDINGS = [
-        Binding("ctrl+c,ctrl+q", "quit", "Quit"),
-        Binding("ctrl+s", "save_game", "Save"),
-        Binding("ctrl+l", "load_game", "Load")
-    ]
-    
-    def __init__(self, engine: GameEngine):
+    def __init__(self, engine):
         super().__init__()
         self.engine = engine
+        self.game_log = GameLog()
+        self.command_input = CommandInput()
         
     def compose(self) -> ComposeResult:
         """Create child widgets."""
-        yield Label("Farsi Text Adventure MUD")
-        yield GameDisplay()
-        yield CommandInput()
-        
+        with ScrollableContainer():
+            yield self.game_log
+        with Container(id="input-container"):
+            yield self.command_input
+    
     def on_mount(self) -> None:
-        """Handle app mount event."""
+        """Handle app mount."""
+        # Focus command input
+        self.command_input.focus()
         # Show initial room description
-        self.handle_command("look")
-        
+        response = self.engine.process_command("look")
+        self.game_log.write_game_text(response)
+    
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle command input."""
         command = event.value.strip()
         if command:
-            # Add to history
-            input_widget = self.query_one(CommandInput)
-            input_widget.history.append(command)
-            input_widget.history_index = len(input_widget.history)
-            input_widget.value = ""
-            
+            # Add command to history
+            self.command_input.history.append(command)
+            self.command_input.history_index = len(self.command_input.history)
+            # Show command
+            self.game_log.write_game_text(f"> {command}")
             # Process command
-            self.handle_command(command)
-            
-    def handle_command(self, command: str) -> None:
-        """Process command and display response."""
-        response = self.engine.process_command(command)
-        display = self.query_one(GameDisplay)
-        
-        # Format command echo
-        if command != "look":  # Don't echo initial look command
-            display.write(f"\n> {command}")
-            
-        # Format response with proper RTL support
-        display.write(f"\n{response}\n")
-        
-    def action_save_game(self) -> None:
-        """Save game state."""
-        try:
-            self.engine.state.save_game("savegame.json")
-            self.notify("Game saved successfully")
-        except Exception as e:
-            self.notify(f"Error saving game: {e}", severity="error")
-            
-    def action_load_game(self) -> None:
-        """Load game state."""
-        try:
-            self.engine.state.load_game("savegame.json", self.engine.vocab)
-            self.notify("Game loaded successfully")
-            # Show new room
-            self.handle_command("look")
-        except Exception as e:
-            self.notify(f"Error loading game: {e}", severity="error")
+            response = self.engine.process_command(command)
+            self.game_log.write_game_text(response)
+            # Clear input
+            self.command_input.value = ""
