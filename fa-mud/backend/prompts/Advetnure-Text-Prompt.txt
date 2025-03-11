@@ -1,0 +1,141 @@
+## Game Scenario
+A text adventure game.
+
+## Game's Goal
+This is an educational game for learning Farsi.
+
+## Endgame Condition
+The player wins the game when they have learned all vocabulary words.
+
+## Game Interface
+
+There are no graphics, just text.
+There is a box that shows the current adventure text.
+There is a box for the player to input actions along with interactions with the environment or inventory .
+
+## Game World
+
+### Rooms
+The game should be limited to 6 rooms you can move between.
+Each room should contain 3-4 vocabulary words from objects.
+No vocabulary should repeat in different rooms.
+There must be exactly 20 object-based vocabulary words total across all rooms.
+Words should be thematically appropriate for their room.
+
+### NPCs
+The game should include 4-6 NPCs placed in appropriate rooms.
+Each NPC should:
+- Have a role that fits the setting (e.g., barista in a cafe)
+- Have a Farsi name and title
+- Know 2-3 unique vocabulary words that can only be learned through conversation
+- Respond naturally to the صحبت کردن (sohbat kardan) command
+There must be exactly 10 NPC conversation words total.
+
+### Vocabulary Types
+1. Object Vocabulary (20 words)
+   - Learned by interacting with objects in rooms
+   - Uses verbs like دیدن, گرفتن, استفاده کردن
+
+2. Conversation Vocabulary (10 words)
+   - Only learned by talking with NPCs
+   - Must use صحبت کردن to discover these words
+   - Words should relate to the NPC's role
+   - More advanced or specialized terms
+
+### Theme
+The game should take place in a real world setting.
+The player should choose at the start of the game at the setting from the following options:
+- Office
+- School
+- Restaurant
+- Hospital
+- Gym
+- Postoffice
+- Hardware Store
+- Church
+- Bakery
+- Cafe
+- Library
+- Arcade
+- GenAI Tech Conference
+- Internet Chatroom
+
+## Game Rules
+
+### Fixed Actions
+These are the only expected actions in a game session.
+- Look (examine surroundings or objects)
+- Move (or go in a direction)
+    - North, Up, Left, Right
+- Take (pick up items)
+- Drop (discard items)
+- Talk/Say (communicate with NPCs)
+- Use (interact with items)
+- Give (transfer items to others)
+- Open (doors, chests, etc.)
+- Close (doors, containers)
+- Eat (consume food items)
+- Inventory (check carried items)
+- Drink (consume liquids)
+- Help (view commands/instructions)
+
+### Desktop Adventure Text
+- One paragraph. 
+- be concise.
+- Not every object, NPC, or environment description needs to be called out.
+  - The words should emerge through interaction in the room.
+
+### Vocabulary Learning Rules
+1. Word Introduction
+   - Each room or scene contains exactly one Farsi vocabulary word
+   - Words are introduced through object descriptions, NPC dialogue, or environmental text
+   - New words are always shown in format: فارسی (romaji / english)
+
+2. Word Mastery System
+   - Players must interact with each word once succesfully using a fixed action.
+   - the fixed action has to make sense in context with the vocabulary word.
+
+3. Action-Vocabulary Integration
+   - دیدن (deyn/look): Look at objects or surroundings
+     Example: "سفید (saffid) را دیدن" (soffid ra deyn) to look at the chair
+   
+   - حرکت کردن (herkat kardan/move): Move in a direction
+     Example: "شمالی (shomal) به حرکت کردن" (shomal be herkat kardan) to move north
+   
+   - گرفتن (garftan/take): Pick up items
+     Example: "کتاب (ketab) را گرفتن" (ketab ra garftan) to take a book
+   
+   - برداشتن (bardashtan/drop): Drop items
+     Example: "کتاب (ketab) را برداشتن" (ketab ra bardashtan) to drop a book
+   
+   - صحبت کردن (sohbat kardan/talk): Talk with NPCs
+     Example: "معلم (ma'lum) را صحبت کردن" (ma'lum ra sohbat kardan) to talk with teacher
+   
+   - استفاده کردن (estefade kardan/use): Use items
+     Example: "کلید (keli) را استفاده کردن" (keli ra estefade kardan) to use a key
+   
+   - دادن (daden/give): Give items to NPCs
+     Example: "معلم (ma'lum) را کتاب دادن" (ma'lum ra ketab daden) to give book to teacher
+   
+   - باز کردن (baz kardan/open): Open objects
+     Example: "در (door) را باز کردن" (door ra baz kardan) to open the door
+   
+   - بستن (bastan/close): Close objects
+     Example: "در (door) را بستن" (door ra bastan) to close the door
+   
+   - خوردن (khurdan/eat): Eat food items
+     Example: "سیب (sib) را خوردن" (sib ra khurdan) to eat an apple
+   
+   - نوشتن (noshtan/drink): Drink items
+     Example: "چای (cha) را نوشتن" (cha ra noshtan) to drink tea
+   
+   - دیدن (deyn/check): Check bag contents
+     Example: "درون کیف (darun kif) را دیدن" (darun kif ra deyn) to look in the bag
+   
+   - کمک (komek/help): Ask for help
+     Example: "کمک" (komek) to see commands
+
+4. Progress Tracking
+   - Game maintains a list of mastered vocabulary
+   - Each mastered word counts toward the 20-word goal
+   - Player can check progress using "Help" command
