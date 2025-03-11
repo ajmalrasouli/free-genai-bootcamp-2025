@@ -1,4 +1,3 @@
-
 # **Farsi Text Adventure MUD** 
 **A Language Immersion Game for Learning Farsi** 
 
@@ -10,6 +9,13 @@ Farsi Text Adventure MUD is a single-player, text-based adventure game designed 
 ---
 
 ## **Features** 
+- **Themed Rooms**: Explore different environments (Library, Garden, Dining Room, Bedroom) each with unique items and NPCs
+- **Interactive NPCs**: Talk to characters who respond in context-appropriate ways
+- **Rich Vocabulary**: Learn Farsi words for:
+  - Basic items (کتاب/book, شمشیر/sword, درخت/tree)
+  - Food and drink (نان/bread, چای/tea, سیب/apple)
+  - Furniture (میز/table, صندلی/chair, تخت/bed)
+  - Characters (مرد/man, زن/woman, پیرمرد/old man)
 - **Dynamic World Generation**: Procedurally generated rooms, items, and NPCs. 
 - **Farsi Vocabulary Integration**: Every sentence includes **one Farsi word** in context. 
 - **Fixed Verb Set**: 15 predefined commands (e.g., `Take`, `Use`, `Talk`). 
@@ -24,19 +30,16 @@ Farsi Text Adventure MUD is a single-player, text-based adventure game designed 
    git clone https://github.com/yourusername/farsi-mud.git
    cd farsi-mud
    ```
-
 2. **Set Up a Virtual Environment**: 
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/macOS
    venv\Scripts\activate     # Windows
    ```
-
 3. **Install Dependencies**: 
    ```bash
    pip install -r requirements.txt
    ```
-
 4. **Run the Game**: 
    ```bash
    python main.py
@@ -54,6 +57,29 @@ Farsi Text Adventure MUD is a single-player, text-based adventure game designed 
 | `Use`        | `Use کلید on در`         | Use an item on another object.       | 
 | `Inventory`  | `Inventory`              | View your carried items.             | 
 | `Help`       | `Help`                   | View all available commands.         | 
+
+### **Item Interactions** 
+- `take کتاب` - Pick up a book
+- `drop کتاب` - Drop a book
+- `use کلید on صندوق` - Use key on chest
+- `give نان to مرد` - Give bread to man
+
+### **Consumption** 
+- `eat نان` - Eat bread
+- `drink چای` - Drink tea
+
+### **Room Guide** 
+- **Library (کتابخانه)**
+  - Find: کتاب (book), میز (table)
+  - Meet: پیرمرد (old man)
+- **Garden (باغ)**
+  - Find: درخت (tree), سیب (apple)
+  - Meet: مرد (man)
+- **Dining Room (اتاق غذاخوری)**
+  - Find: نان (bread), چای (tea)
+  - Meet: زن (woman)
+- **Bedroom (اتاق خواب)**
+  - Find: تخت (bed), چراغ (lamp)
 
 ### **Example Gameplay** 
 ```plaintext
