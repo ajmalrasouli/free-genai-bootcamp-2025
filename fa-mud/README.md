@@ -1,4 +1,3 @@
----
 
 # **Farsi Text Adventure MUD** 
 **A Language Immersion Game for Learning Farsi** 
