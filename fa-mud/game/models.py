@@ -4,29 +4,32 @@ import json
 import hazm
 import arabic_reshaper
 from bidi.algorithm import get_display
+from game.vocabulary_loader import normalize_farsi
 
 class Item:
     """Game item class."""
     
     def __init__(self, data: Dict):
         """Initialize item."""
-        self.name_fa = data["word"]  # Farsi name
+        # Process Farsi name with proper text shaping
+        self.name_fa = normalize_farsi(data["word"])  # Farsi name
         self.name_en = data["translation"]  # English name
         self.is_portable = data.get("is_portable", True)
         self.is_edible = data.get("is_edible", False)
         self.is_drinkable = data.get("is_drinkable", False)
         self.state = {}  # For tracking item state
-
+        
 class NPC:
     """Non-player character class."""
     
     def __init__(self, data: Dict):
         """Initialize NPC."""
-        self.name_fa = data["word"]  # Farsi name
+        # Process Farsi name with proper text shaping
+        self.name_fa = normalize_farsi(data["word"])  # Farsi name
         self.name_en = data["translation"]  # English name
         self.dialogue: List[str] = []
         self.state = {}  # For tracking NPC state
-
+        
 class Room:
     """Game room class."""
     
@@ -38,7 +41,6 @@ class Room:
         self.exits: Dict[str, str] = {}  # direction -> room_id
         self.items: List[Item] = []
         self.npcs: List[NPC] = []
-        self.normalizer = hazm.Normalizer()
         self.state = {}  # For tracking room state
         
     @property
@@ -57,10 +59,9 @@ class Room:
             if word.startswith('**') and word.endswith('**'):
                 # Process Farsi word
                 farsi = word[2:-2]
-                normalized = self.normalizer.normalize(farsi)
-                reshaped = arabic_reshaper.reshape(normalized)
-                bidi_text = get_display(reshaped)
-                processed_words.append(f"**\u200F{bidi_text}**")
+                # Use the centralized normalize_farsi function
+                processed_farsi = normalize_farsi(farsi)
+                processed_words.append(f"**{processed_farsi}**")
             else:
                 processed_words.append(word)
         

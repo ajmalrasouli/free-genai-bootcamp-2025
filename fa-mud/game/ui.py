@@ -5,6 +5,7 @@ from bidi.algorithm import get_display
 from textual.app import App, ComposeResult
 from textual.containers import Container, ScrollableContainer
 from textual.widgets import Input, RichLog
+from game.vocabulary_loader import normalize_farsi
 
 class CommandInput(Input):
     """Command input with history."""
@@ -20,7 +21,7 @@ class CommandInput(Input):
         # Set up normalizer first
         self.normalizer = hazm.Normalizer()
         # Initialize with Farsi placeholder
-        placeholder = self.normalize_farsi("دستور را وارد کنید")
+        placeholder = normalize_farsi("دستور را وارد کنید")
         super().__init__(placeholder=placeholder)
         self.history: list[str] = []
         self.history_index = 0
@@ -31,12 +32,14 @@ class CommandInput(Input):
             return text
         # Remove any existing RTL/LTR marks
         text = text.replace('\u200F', '').replace('\u200E', '')
-        # Normalize using hazm
-        text = self.normalizer.normalize(text)
-        # Reshape Arabic/Farsi characters
+        # First reshape Arabic/Farsi characters to maintain connections
         text = arabic_reshaper.reshape(text)
-        # Add RTL mark and apply BIDI algorithm
-        return '\u200F' + get_display(text)
+        # Then normalize to ensure consistent character forms
+        text = self.normalizer.normalize(text)
+        # Apply BIDI algorithm without RTL marks
+        text = get_display(text)
+        # Add RTL marks at both ends to maintain direction
+        return f'\u200F{text}\u200F'
     
     def _on_change(self, value: str) -> None:
         """Handle input changes to process Farsi text."""
@@ -74,16 +77,7 @@ class GameLog(RichLog):
     
     def normalize_farsi(self, text: str) -> str:
         """Normalize Farsi text for consistent processing."""
-        if not text:
-            return text
-        # Remove any existing RTL/LTR marks
-        text = text.replace('\u200F', '').replace('\u200E', '')
-        # Normalize using hazm
-        text = self.normalizer.normalize(text)
-        # Reshape Arabic/Farsi characters
-        text = arabic_reshaper.reshape(text)
-        # Add RTL mark and apply BIDI algorithm
-        return '\u200F' + get_display(text)
+        return normalize_farsi(text)
     
     def write_game_text(self, text: str) -> None:
         """Write text to display with proper RTL support."""
@@ -104,22 +98,19 @@ class GameLog(RichLog):
                     # Process Farsi word in markers
                     farsi = word[2:-2]
                     # Process Farsi text with proper shaping
-                    processed_words.append(f"**{self.normalize_farsi(farsi)}**")
+                    processed_words.append(f"**{normalize_farsi(farsi)}**")
                 elif any('\u0600' <= c <= '\u06FF' for c in word):
                     # Process other Farsi words
-                    processed_words.append(self.normalize_farsi(word))
+                    processed_words.append(normalize_farsi(word))
                 else:
                     processed_words.append(word)
             
             # Join words with RTL-safe spacing
             processed_line = " ".join(processed_words)
-            # Ensure each line starts with RTL mark if it contains Farsi
-            if any('\u0600' <= c <= '\u06FF' for c in processed_line):
-                processed_line = f'\u200F{processed_line}'
             processed_lines.append(processed_line)
         
-        # Write processed text
-        self.write("\n".join(processed_lines))
+        # Write processed text with a single RTL mark at the start
+        self.write('\u200F' + "\n".join(processed_lines))
 
 class GameUI(App):
     """Main game UI application."""

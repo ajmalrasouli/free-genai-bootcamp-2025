@@ -28,12 +28,13 @@ class GameEngine:
             return text
         # Remove any existing RTL/LTR marks
         text = text.replace('\u200F', '').replace('\u200E', '')
-        # Normalize using hazm
-        text = self.normalizer.normalize(text)
-        # Reshape Arabic/Farsi characters
+        # First reshape Arabic/Farsi characters to ensure proper joining
         text = arabic_reshaper.reshape(text)
-        # Add RTL mark and apply BIDI algorithm
-        return '\u200F' + get_display(text)
+        # Then normalize to ensure consistent character forms
+        text = self.normalizer.normalize(text)
+        # Finally apply BIDI algorithm
+        # Note: We don't add RTL marks here - they'll be added at display time
+        return get_display(text)
         
     def process_command(self, command: str) -> str:
         """Process a game command and return response."""

@@ -5,6 +5,45 @@ import hazm
 import arabic_reshaper
 from bidi.algorithm import get_display
 
+def normalize_farsi(text: str) -> str:
+    """Normalize Farsi text for consistent processing across the application.
+    
+    This centralized function should be used by all components to ensure
+    consistent Farsi text processing throughout the application.
+    
+    Args:
+        text: The Farsi text to normalize
+        
+    Returns:
+        Properly normalized and reshaped Farsi text
+    """
+    if not text:
+        return text
+    
+    # Remove any existing RTL/LTR marks
+    text = text.replace('\u200F', '').replace('\u200E', '')
+    
+    # Normalize to ensure consistent character forms
+    normalizer = hazm.Normalizer()
+    text = normalizer.normalize(text)
+    
+    # Configure the reshaper for Farsi
+    configuration = {
+        'delete_harakat': False,
+        'support_ligatures': True,
+        'language': 'Farsi',
+        'use_unshaped_instead_of_isolated': True
+    }
+    
+    # Create a reshaper instance with our configuration
+    reshaper = arabic_reshaper.ArabicReshaper(configuration=configuration)
+    
+    # Reshape Arabic/Farsi characters to maintain connections
+    text = reshaper.reshape(text)
+    
+    # Apply BIDI algorithm
+    return get_display(text)
+
 class VocabularyLoader:
     """Load and validate Farsi vocabulary."""
     
@@ -15,17 +54,7 @@ class VocabularyLoader:
     
     def normalize_farsi(self, text: str) -> str:
         """Normalize Farsi text for consistent processing."""
-        if not text:
-            return text
-        # Remove any existing RTL/LTR marks
-        text = text.replace('\u200F', '').replace('\u200E', '')
-        # First reshape Arabic/Farsi characters to maintain connections
-        text = arabic_reshaper.reshape(text)
-        # Then normalize to ensure consistent character forms
-        text = self.normalizer.normalize(text)
-        # Apply BIDI algorithm and add RTL marks at both ends
-        text = get_display(text)
-        return f'\u200F{text}\u200F'
+        return normalize_farsi(text)
     
     def load_vocabulary(self, filename: str) -> Dict[str, Dict]:
         """Load vocabulary from JSON file."""
