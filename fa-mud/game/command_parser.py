@@ -18,20 +18,13 @@ class CommandParser:
     def __init__(self):
         """Initialize command parser."""
         self.normalizer = hazm.Normalizer()
-        # Command pattern: verb + target [+ preposition + recipient]
+        # Command pattern: [Verb] [Farsi Word] (on/to [Farsi Word])?
         self.command_pattern = re.compile(
             r'^(?P<verb>\w+)\s+(?P<target>\S+)(?:\s+(on|to)\s+(?P<recipient>\S+))?$'
         )
     
     def parse_command(self, command: str) -> Optional[Dict[str, str]]:
-        """Parse a command string into components.
-        
-        Args:
-            command: Raw command string from user
-            
-        Returns:
-            Dictionary with parsed components or None if invalid
-        """
+        """Parse a command string into components."""
         command = command.strip().lower()
         
         # Handle special commands
@@ -49,11 +42,11 @@ class CommandParser:
         if components['verb'] not in self.VALID_VERBS:
             return None
             
-        # Process Farsi text in target and recipient
+        # Strip RTL marks from Farsi words
         if components.get('target'):
-            components['target'] = self._process_farsi_text(components['target'])
+            components['target'] = components['target'].lstrip('\u200F')
         if components.get('recipient'):
-            components['recipient'] = self._process_farsi_text(components['recipient'])
+            components['recipient'] = components['recipient'].lstrip('\u200F')
             
         return components
     
@@ -63,16 +56,7 @@ class CommandParser:
         current_room: Room,
         player: Player
     ) -> Tuple[bool, str]:
-        """Validate command in game context.
-        
-        Args:
-            components: Parsed command components
-            current_room: Player's current room
-            player: Player object
-            
-        Returns:
-            Tuple of (is_valid, error_message)
-        """
+        """Validate command in game context."""
         verb = components['verb']
         target = components.get('target')
         recipient = components.get('recipient')
@@ -109,7 +93,7 @@ class CommandParser:
             elif verb == 'give':
                 if not any(i.name_fa == target for i in player.inventory):
                     return False, f"You don't have **{target}**."
-                if not any(n.name_fa == recipient for n in current_room.npcs):
+                if recipient and not any(n.name_fa == recipient for n in current_room.npcs):
                     return False, f"There is no **{recipient}** here."
                     
         # Validate object interactions
@@ -119,20 +103,12 @@ class CommandParser:
                 
         # Validate consumption
         if verb in {'eat', 'drink'}:
-            item = player.get_item(target)
-            if not item:
+            if not any(i.name_fa == target for i in player.inventory):
                 return False, f"You don't have **{target}**."
+            item = next((i for i in player.inventory if i.name_fa == target), None)
             if verb == 'eat' and not item.is_edible:
                 return False, f"You can't eat **{target}**."
             if verb == 'drink' and not item.is_drinkable:
                 return False, f"You can't drink **{target}**."
                 
         return True, ""
-        
-    def _process_farsi_text(self, text: str) -> str:
-        """Process Farsi text for proper RTL display."""
-        # Normalize and reshape Farsi text
-        normalized = self.normalizer.normalize(text)
-        reshaped = arabic_reshaper.reshape(normalized)
-        # Add RTL mark
-        return f"\u200F{reshaped}"
