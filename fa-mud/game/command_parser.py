@@ -20,8 +20,21 @@ class CommandParser:
         self.normalizer = hazm.Normalizer()
         # Command pattern: [Verb] [Farsi Word] (on/to [Farsi Word])?
         self.command_pattern = re.compile(
-            r'^(?P<verb>\w+)\s+(?P<target>\S+)(?:\s+(on|to)\s+(?P<recipient>\S+))?$'
+            r'^(?P<verb>\w+)\s+(?P<target>[^\s]+)(?:\s+(on|to)\s+(?P<recipient>[^\s]+))?$'
         )
+
+    def normalize_farsi(self, text: str) -> str:
+        """Normalize Farsi text for consistent processing."""
+        if not text:
+            return text
+        # Remove any existing RTL marks
+        text = text.replace('\u200F', '').replace('\u200E', '')
+        # Normalize using hazm
+        text = self.normalizer.normalize(text)
+        # Reshape Arabic/Farsi characters
+        text = arabic_reshaper.reshape(text)
+        # Add RTL mark and apply BIDI algorithm
+        return '\u200F' + get_display(text)
     
     def parse_command(self, command: str) -> Optional[Dict[str, str]]:
         """Parse a command string into components."""
@@ -42,11 +55,11 @@ class CommandParser:
         if components['verb'] not in self.VALID_VERBS:
             return None
             
-        # Strip RTL marks from Farsi words
+        # Normalize Farsi words
         if components.get('target'):
-            components['target'] = components['target'].lstrip('\u200F')
+            components['target'] = self.normalize_farsi(components['target'])
         if components.get('recipient'):
-            components['recipient'] = components['recipient'].lstrip('\u200F')
+            components['recipient'] = self.normalize_farsi(components['recipient'])
             
         return components
     
@@ -64,51 +77,69 @@ class CommandParser:
         # Special commands need no validation
         if verb in {'inventory', 'help'}:
             return True, ""
+
+        # Normalize target and recipient for comparison
+        if target:
+            target = self.normalize_farsi(target)
+        if recipient:
+            recipient = self.normalize_farsi(recipient)
             
         # Validate target exists
         if verb == 'look':
-            if target and target not in current_room.get_visible_objects():
-                return False, f"You don't see any **{target}** here."
+            visible_objects = {self.normalize_farsi(obj) for obj in current_room.get_visible_objects()}
+            if target and target not in visible_objects:
+                return False, f"You don't see any {target} here."
             return True, ""
             
         # Validate movement
         if verb == 'move':
-            if target not in current_room.exits:
+            normalized_exits = {self.normalize_farsi(exit) for exit in current_room.exits}
+            if target not in normalized_exits:
                 return False, f"You can't go {target}."
             return True, ""
             
         # Validate item interactions
         if verb in {'take', 'drop', 'use', 'give'}:
             if verb == 'take':
-                if not any(i.name_fa == target for i in current_room.items):
-                    return False, f"There is no **{target}** here."
+                room_items = {self.normalize_farsi(i.name_fa) for i in current_room.items}
+                if target not in room_items:
+                    return False, f"There is no {target} here."
             elif verb == 'drop':
-                if not any(i.name_fa == target for i in player.inventory):
-                    return False, f"You don't have **{target}**."
+                inventory_items = {self.normalize_farsi(i.name_fa) for i in player.inventory}
+                if target not in inventory_items:
+                    return False, f"You don't have {target}."
             elif verb == 'use':
-                if not any(i.name_fa == target for i in player.inventory):
-                    return False, f"You don't have **{target}**."
-                if recipient and not any(i.name_fa == recipient and i.is_usable for i in current_room.items):
-                    return False, f"You can't use that on **{recipient}**."
+                inventory_items = {self.normalize_farsi(i.name_fa) for i in player.inventory}
+                if target not in inventory_items:
+                    return False, f"You don't have {target}."
+                if recipient:
+                    usable_items = {self.normalize_farsi(i.name_fa) for i in current_room.items if i.is_usable}
+                    if recipient not in usable_items:
+                        return False, f"You can't use that on {recipient}."
             elif verb == 'give':
-                if not any(i.name_fa == target for i in player.inventory):
-                    return False, f"You don't have **{target}**."
-                if recipient and not any(n.name_fa == recipient for n in current_room.npcs):
-                    return False, f"There is no **{recipient}** here."
+                inventory_items = {self.normalize_farsi(i.name_fa) for i in player.inventory}
+                if target not in inventory_items:
+                    return False, f"You don't have {target}."
+                if recipient:
+                    npc_names = {self.normalize_farsi(n.name_fa) for n in current_room.npcs}
+                    if recipient not in npc_names:
+                        return False, f"There is no {recipient} here."
                     
         # Validate object interactions
         if verb in {'open', 'close'}:
-            if not any(i.name_fa == target and not i.is_portable for i in current_room.items):
-                return False, f"You can't {verb} **{target}**."
+            static_items = {self.normalize_farsi(i.name_fa) for i in current_room.items if not i.is_portable}
+            if target not in static_items:
+                return False, f"You can't {verb} {target}."
                 
         # Validate consumption
         if verb in {'eat', 'drink'}:
-            if not any(i.name_fa == target for i in player.inventory):
-                return False, f"You don't have **{target}**."
-            item = next((i for i in player.inventory if i.name_fa == target), None)
+            inventory_items = {self.normalize_farsi(i.name_fa) for i in player.inventory}
+            if target not in inventory_items:
+                return False, f"You don't have {target}."
+            item = next((i for i in player.inventory if self.normalize_farsi(i.name_fa) == target), None)
             if verb == 'eat' and not item.is_edible:
-                return False, f"You can't eat **{target}**."
+                return False, f"You can't eat {target}."
             if verb == 'drink' and not item.is_drinkable:
-                return False, f"You can't drink **{target}**."
+                return False, f"You can't drink {target}."
                 
         return True, ""

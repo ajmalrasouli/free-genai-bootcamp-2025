@@ -17,15 +17,26 @@ class CommandInput(Input):
     """
     
     def __init__(self):
+        # Set up normalizer first
+        self.normalizer = hazm.Normalizer()
         # Initialize with Farsi placeholder
-        farsi_text = "دستور را وارد کنید"
-        normalized = hazm.Normalizer().normalize(farsi_text)
-        reshaped = arabic_reshaper.reshape(normalized)
-        bidi_text = get_display(reshaped)
-        super().__init__(placeholder=bidi_text)
+        placeholder = self.normalize_farsi("دستور را وارد کنید")
+        super().__init__(placeholder=placeholder)
         self.history: list[str] = []
         self.history_index = 0
-        self.normalizer = hazm.Normalizer()
+    
+    def normalize_farsi(self, text: str) -> str:
+        """Normalize Farsi text for consistent processing."""
+        if not text:
+            return text
+        # Remove any existing RTL/LTR marks
+        text = text.replace('\u200F', '').replace('\u200E', '')
+        # Normalize using hazm
+        text = self.normalizer.normalize(text)
+        # Reshape Arabic/Farsi characters
+        text = arabic_reshaper.reshape(text)
+        # Add RTL mark and apply BIDI algorithm
+        return '\u200F' + get_display(text)
     
     def _on_change(self, value: str) -> None:
         """Handle input changes to process Farsi text."""
@@ -38,15 +49,11 @@ class CommandInput(Input):
         if len(words) >= 2:
             # Process Farsi target word
             if any('\u0600' <= c <= '\u06FF' for c in words[1]):
-                normalized = self.normalizer.normalize(words[1])
-                reshaped = arabic_reshaper.reshape(normalized)
-                words[1] = get_display(reshaped)
+                words[1] = self.normalize_farsi(words[1])
             
             # Process second Farsi word if present
             if len(words) > 3 and words[2] in {'on', 'to'} and any('\u0600' <= c <= '\u06FF' for c in words[3]):
-                normalized = self.normalizer.normalize(words[3])
-                reshaped = arabic_reshaper.reshape(normalized)
-                words[3] = get_display(reshaped)
+                words[3] = self.normalize_farsi(words[3])
             
             value = " ".join(words)
                 
@@ -64,6 +71,19 @@ class GameLog(RichLog):
     def __init__(self):
         super().__init__()
         self.normalizer = hazm.Normalizer()
+    
+    def normalize_farsi(self, text: str) -> str:
+        """Normalize Farsi text for consistent processing."""
+        if not text:
+            return text
+        # Remove any existing RTL/LTR marks
+        text = text.replace('\u200F', '').replace('\u200E', '')
+        # Normalize using hazm
+        text = self.normalizer.normalize(text)
+        # Reshape Arabic/Farsi characters
+        text = arabic_reshaper.reshape(text)
+        # Add RTL mark and apply BIDI algorithm
+        return '\u200F' + get_display(text)
     
     def write_game_text(self, text: str) -> None:
         """Write text to display with proper RTL support."""
@@ -83,14 +103,10 @@ class GameLog(RichLog):
                 if word.startswith('**') and word.endswith('**'):
                     # Process Farsi word in markers
                     farsi = word[2:-2]
-                    normalized = self.normalizer.normalize(farsi)
-                    reshaped = arabic_reshaper.reshape(normalized)
-                    processed_words.append(f"**{get_display(reshaped)}**")
+                    processed_words.append(f"**{self.normalize_farsi(farsi)}**")
                 elif any('\u0600' <= c <= '\u06FF' for c in word):
                     # Process other Farsi words
-                    normalized = self.normalizer.normalize(word)
-                    reshaped = arabic_reshaper.reshape(normalized)
-                    processed_words.append(get_display(reshaped))
+                    processed_words.append(self.normalize_farsi(word))
                 else:
                     processed_words.append(word)
             
@@ -141,7 +157,7 @@ class GameUI(App):
             # Add command to history
             self.command_input.history.append(command)
             self.command_input.history_index = len(self.command_input.history)
-            # Show command
+            # Show command with proper RTL formatting
             self.game_log.write_game_text(f"> {command}")
             # Process command
             response = self.engine.process_command(command)

@@ -13,22 +13,18 @@ class VocabularyLoader:
         self.normalizer = hazm.Normalizer()
         self.words = self.create_default_vocabulary()
     
-    def process_farsi_text(self, text: str) -> str:
-        """Process Farsi text for proper RTL display."""
+    def normalize_farsi(self, text: str) -> str:
+        """Normalize Farsi text for consistent processing."""
         if not text:
             return text
-            
-        # Check if text already has RTL mark
-        if text.startswith('\u200F'):
-            return text
-            
-        # Normalize and reshape Farsi text
-        normalized = self.normalizer.normalize(text)
-        reshaped = arabic_reshaper.reshape(normalized)
-        # Convert to display form with proper RTL
-        bidi_text = get_display(reshaped)
-        # Add RTL mark
-        return f"\u200F{bidi_text}"
+        # Remove any existing RTL/LTR marks
+        text = text.replace('\u200F', '').replace('\u200E', '')
+        # Normalize using hazm
+        text = self.normalizer.normalize(text)
+        # Reshape Arabic/Farsi characters
+        text = arabic_reshaper.reshape(text)
+        # Add RTL mark and apply BIDI algorithm
+        return '\u200F' + get_display(text)
     
     def load_vocabulary(self, filename: str) -> Dict[str, Dict]:
         """Load vocabulary from JSON file."""
@@ -37,9 +33,12 @@ class VocabularyLoader:
             # Process each Farsi word for proper RTL display
             processed_vocab = {}
             for word_data in vocab:
-                # Process Farsi text
-                farsi = word_data["word"]
-                word_data["word"] = self.process_farsi_text(farsi)
+                # Process Farsi text and example
+                word_data["word"] = self.normalize_farsi(word_data["word"])
+                word_data["example"] = word_data["example"].replace(
+                    word_data["word"].lstrip('\u200F'),
+                    word_data["word"]
+                )
                 processed_vocab[word_data["word"]] = word_data
             return processed_vocab
     
@@ -130,37 +129,54 @@ class VocabularyLoader:
         processed_vocab = {}
         for word_data in vocab:
             # Process Farsi text
-            farsi = word_data["word"]
-            processed_farsi = self.process_farsi_text(farsi)
-            word_data["word"] = processed_farsi
+            word_data["word"] = self.normalize_farsi(word_data["word"])
             # Also process example
-            example = word_data["example"]
-            word_data["example"] = example.replace(farsi, processed_farsi)
-            processed_vocab[processed_farsi] = word_data
+            word_data["example"] = word_data["example"].replace(
+                word_data["word"].lstrip('\u200F'),
+                word_data["word"]
+            )
+            processed_vocab[word_data["word"]] = word_data
         return processed_vocab
     
     def get_word(self, farsi_word: str) -> Dict:
         """Get word data by Farsi text."""
-        # Check if word already has RTL mark
-        if not farsi_word.startswith('\u200F'):
-            # Process input word for lookup
-            lookup_key = self.process_farsi_text(farsi_word)
-        else:
-            lookup_key = farsi_word
+        # Always normalize input word for consistent lookup
+        lookup_key = self.normalize_farsi(farsi_word)
         return self.words.get(lookup_key)
     
     def validate_vocabulary(self, vocab: Dict[str, Dict]) -> bool:
         """Validate vocabulary entries."""
+        required_fields = {"word", "translation", "pos", "example"}
+        valid_pos = {"noun", "verb", "adjective", "adverb"}
+        
         for word_data in vocab.values():
+            # Check required fields first
+            if not all(field in word_data for field in required_fields):
+                return False
+                
             # Remove RTL mark for validation
             farsi_text = word_data["word"].lstrip('\u200F')
-            # Check if Farsi text contains only Farsi characters
-            if not all(('\u0600' <= c <= '\u06FF' or c.isspace()) for c in farsi_text):
+            
+            # Validate Farsi text
+            if not farsi_text or not all(
+                '\u0600' <= c <= '\u06FF' or c.isspace() 
+                for c in farsi_text
+            ):
                 return False
-            # Check if English text contains only ASCII characters
-            if not all(ord(c) < 128 for c in word_data["translation"]):
+                
+            # Validate English translation
+            if not word_data["translation"] or not all(
+                ord(c) < 128 
+                for c in word_data["translation"]
+            ):
                 return False
-            # Check required fields
-            if not all(k in word_data for k in ["word", "translation", "pos", "example"]):
+                
+            # Validate part of speech
+            if word_data["pos"] not in valid_pos:
                 return False
+                
+            # Validate example contains the Farsi word
+            if word_data["word"] not in word_data["example"]:
+                return False
+                
         return True
