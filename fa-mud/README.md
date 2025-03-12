@@ -131,11 +131,19 @@ python main.py --vocab data/words.json
 - **Game Engine**: Manages world state, player inventory, and room connections. 
 - **UI Framework**: Built with Textual for a rich terminal interface. 
 
+### **Farsi Text Processing**
+- **Bidirectional Text Support**: Properly handles mixed RTL (Right-to-Left) and LTR (Left-to-Right) text.
+- **Arabic Reshaping**: Uses arabic_reshaper with custom configuration for proper character shaping.
+- **Farsi Normalization**: Centralizes text normalization through hazm for consistent text processing.
+- **Character Joining**: Ensures Farsi letters connect properly when displayed in terminal.
+
 ### **Dependencies** 
 - Python 3.10+ 
 - Libraries: 
   - `Textual` for terminal UI. 
   - `Hazm` for Farsi NLP and validation. 
+  - `arabic_reshaper` for Farsi/Arabic character shaping.
+  - `python-bidi` for bidirectional text support.
   - `pytest` for unit testing. 
 
 ---
