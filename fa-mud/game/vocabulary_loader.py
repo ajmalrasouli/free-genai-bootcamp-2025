@@ -19,12 +19,13 @@ class VocabularyLoader:
             return text
         # Remove any existing RTL/LTR marks
         text = text.replace('\u200F', '').replace('\u200E', '')
-        # Normalize using hazm
-        text = self.normalizer.normalize(text)
-        # Reshape Arabic/Farsi characters
+        # First reshape Arabic/Farsi characters to maintain connections
         text = arabic_reshaper.reshape(text)
-        # Add RTL mark and apply BIDI algorithm
-        return '\u200F' + get_display(text)
+        # Then normalize to ensure consistent character forms
+        text = self.normalizer.normalize(text)
+        # Apply BIDI algorithm and add RTL marks at both ends
+        text = get_display(text)
+        return f'\u200F{text}\u200F'
     
     def load_vocabulary(self, filename: str) -> Dict[str, Dict]:
         """Load vocabulary from JSON file."""

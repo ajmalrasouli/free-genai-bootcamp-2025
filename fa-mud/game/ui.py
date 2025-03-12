@@ -103,6 +103,7 @@ class GameLog(RichLog):
                 if word.startswith('**') and word.endswith('**'):
                     # Process Farsi word in markers
                     farsi = word[2:-2]
+                    # Process Farsi text with proper shaping
                     processed_words.append(f"**{self.normalize_farsi(farsi)}**")
                 elif any('\u0600' <= c <= '\u06FF' for c in word):
                     # Process other Farsi words
@@ -110,7 +111,12 @@ class GameLog(RichLog):
                 else:
                     processed_words.append(word)
             
-            processed_lines.append(" ".join(processed_words))
+            # Join words with RTL-safe spacing
+            processed_line = " ".join(processed_words)
+            # Ensure each line starts with RTL mark if it contains Farsi
+            if any('\u0600' <= c <= '\u06FF' for c in processed_line):
+                processed_line = f'\u200F{processed_line}'
+            processed_lines.append(processed_line)
         
         # Write processed text
         self.write("\n".join(processed_lines))
