@@ -1,3 +1,4 @@
+# Requires Python 3.10+
 textual>=0.52.1
 hazm>=0.9.2
 pytest>=7.4.0
