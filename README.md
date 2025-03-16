@@ -98,6 +98,3 @@ cd fa-mud
 pip install -r requirements.txt
 python run_game.py
 ```
-
-## Contributors
-- Ajmal Rasouli
