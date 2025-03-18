@@ -73,9 +73,3 @@ dist/
 *.7z
 *.rar
 *.bz2
-
-# Git LFS (Optional for large files)
-*.mp4
-*.avi
-*.jpeg
-*.gif
