@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farsi Learning Visual Novel</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
+    <style>
+        /* Fix CSS appearance property */
+        #dialogue-box {
+            appearance: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="scene">
+            <div id="background"></div>
+            <div id="character"></div>
+            <div id="dialogue-box">
+                <div id="character-name"></div>
+                <div id="dialogue-text"></div>
+                <div id="click-hint">Click to continue...</div>
+            </div>
+            <div id="choices"></div>
+        </div>
+    </div>
+    <div id="audio-controls">
+        <div class="volume-control">
+            <label for="bgm-volume">BGM Volume</label>
+            <input type="range" id="bgm-volume" min="0" max="1" step="0.1" value="0.3">
+        </div>
+        <div class="volume-control">
+            <label for="sfx-volume">SFX Volume</label>
+            <input type="range" id="sfx-volume" min="0" max="1" step="0.1" value="0.5">
+        </div>
+    </div>
+    <!-- Libraries -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- Game Scripts -->
+    <script src="js/story-data.js"></script>
+    <script src="js/audio-manager.js"></script>
+    <script src="js/save-manager.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/scenes.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.visualNovelEngine = new VisualNovelEngine();
+            window.visualNovelEngine.start();
+        });
+    </script>
+</body>
+</html>
