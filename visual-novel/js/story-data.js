@@ -1,18 +1,18 @@
 const storyData = {
-    scene001: {
+    "scene001": {
         id: "scene001",
         title: "Welcome to Iran",
         location_id: "apartment",
         character_id: "alex",
-        bgm: "main_theme",
+        bgm: "main-theme",
         dialog: {
-            "000": {
-                speaker: "player",
+            "0": {
+                speaker: "narrator",
                 farsi: "شما در آپارتمان جدید خود هستید و نور صبحگاهی از پنجره‌ها می‌تابد.",
                 english: "You wake up in your new apartment in Iran. The morning sunlight streams through the blinds as you hear someone in the kitchen.",
-                default_next_id: "001"
+                default_next_id: "1"
             },
-            "001": {
+            "1": {
                 speaker: "alex",
                 farsi: "صبح بخیر! بیدار شدی؟",
                 english: "Oh, you're up! Good morning!",
@@ -25,7 +25,7 @@ const storyData = {
                             farsi: "بله، درسته! من الکس هستم.",
                             english: "That's right! I'm Alex."
                         },
-                        next_id: "002"
+                        next_id: "2"
                     },
                     {
                         english: "Hello. Nice to meet you.",
@@ -35,17 +35,17 @@ const storyData = {
                             farsi: "خوشوقتم! من الکس هستم. تازه به ایران اومدی؟",
                             english: "Nice to meet you! I'm Alex. You just arrived in Iran?"
                         },
-                        next_id: "002"
+                        next_id: "2"
                     }
                 ]
             },
-            "002": {
+            "2": {
                 speaker: "alex",
                 farsi: "من همینجا زندگی می‌کنم. بیا، یه چیزی درباره‌ی محله بهت بگم.",
                 english: "I live here too. Come on, let me tell you about the neighborhood.",
-                default_next_id: "003"
+                default_next_id: "3"
             },
-            "003": {
+            "3": {
                 speaker: "alex",
                 farsi: "مدرسه زبان نزدیکه، فقط ده دقیقه پیاده‌روی.",
                 english: "The language school is close, just a 10-minute walk.",
@@ -64,65 +64,65 @@ const storyData = {
             }
         }
     },
-    scene002: {
+    "scene002": {
         id: "scene002",
         title: "The Language School",
         location_id: "school_exterior",
-        character_id: "alex",
-        bgm: "street_ambience",
+        character_id: "dr_ahmadi",
+        bgm: "street-ambience",
         dialog: {
-            "000": {
+            "0": {
                 speaker: "alex",
                 farsi: "اینجاست! مدرسه زبان.",
                 english: "Here it is! The language school.",
-                default_next_id: "001"
+                default_next_id: "1"
             },
-            "001": {
-                speaker: "player",
+            "1": {
+                speaker: "narrator",
                 farsi: "ساختمان قشنگیه!",
                 english: "What a beautiful building!",
-                default_next_id: "002"
+                default_next_id: "2"
             },
-            "002": {
-                speaker: "alex",
-                farsi: "دکتر احمدی معلم خیلی خوبیه. من باید برم. موفق باشی!",
-                english: "Dr. Ahmadi is a great teacher. I need to go now. Good luck!",
+            "2": {
+                speaker: "dr_ahmadi",
+                farsi: "سلام! خوش آمدید به مدرسه زبان ما.",
+                english: "Hello! Welcome to our language school.",
                 next_scene_id: "scene003"
             }
         }
     },
-    scene003: {
+    "scene003": {
         id: "scene003",
         title: "Meeting Dr. Ahmadi",
         location_id: "classroom",
-        character_id: "teacher",
-        bgm: "main_theme",
+        character_id: "dr_ahmadi",
+        bgm: "main-theme",
         dialog: {
-            "000": {
-                speaker: "teacher",
+            "0": {
+                speaker: "dr_ahmadi",
                 farsi: "سلام و خوش آمدید! من دکتر احمدی هستم.",
                 english: "Hello and welcome! I'm Dr. Ahmadi.",
                 choices: [
                     {
                         english: "Hello, nice to meet you.",
                         farsi: "سلام، از آشنایی با شما خوشوقتم.",
-                        next_id: "001"
+                        next_id: "1"
                     },
                     {
                         english: "Good morning, Dr. Ahmadi.",
                         farsi: "صبح بخیر، دکتر احمدی.",
-                        next_id: "001"
+                        next_id: "1"
                     }
                 ]
             },
-            "001": {
-                speaker: "teacher",
+            "1": {
+                speaker: "dr_ahmadi",
                 farsi: "امروز با حروف الفبای فارسی شروع می‌کنیم.",
                 english: "Today we'll start with the Farsi alphabet.",
-                default_next_id: "002"
+                default_next_id: "2"
             },
-            "002": {
-                speaker: "teacher",
+            "2": {
+                speaker: "dr_ahmadi",
                 farsi: "این حرف «الف» است. مثل «آب».",
                 english: "This letter is 'Alef'. Like in 'Āb' (water).",
                 choices: [
@@ -130,39 +130,37 @@ const storyData = {
                         english: "Repeat: آب",
                         farsi: "تکرار: آب",
                         response: {
-                            speaker: "teacher",
+                            speaker: "dr_ahmadi",
                             farsi: "آفرین! خیلی خوب بود.",
                             english: "Well done! That was very good."
                         },
-                        next_id: "003"
+                        next_id: "3"
                     }
                 ]
             },
-            "003": {
-                speaker: "teacher",
+            "3": {
+                speaker: "dr_ahmadi",
                 farsi: "برای تمرین، لطفاً به اداره پست بروید و این فرم را پست کنید.",
                 english: "For practice, please go to the post office and mail this form.",
                 next_scene_id: "scene004"
             }
         }
     },
-    scene004: {
+    "scene004": {
         id: "scene004",
         title: "The Post Office",
         location_id: "post_office",
-        character_id: "clerk",
-        bgm: "street_ambience",
+        character_id: "hassan",
+        bgm: "street-ambience",
         dialog: {
-            "000": {
-                speaker: "player",
+            "0": {
+                speaker: "narrator",
                 farsi: "شما وارد اداره پست می‌شوید. پشت پیشخوان، کارمندی با عینک مستطیلی نشسته است.",
                 english: "You enter the post office. Behind the counter sits a clerk with rectangular glasses.",
-                default_next_id: "001",
-                emotion: "neutral",
-                typing_speed: "normal"
+                default_next_id: "1"
             },
-            "001": {
-                speaker: "clerk",
+            "1": {
+                speaker: "hassan",
                 farsi: "سلام، بفرمایید.",
                 english: "Hello, how may I help you?",
                 choices: [
@@ -170,30 +168,26 @@ const storyData = {
                         english: "Hello, I need to mail this form.",
                         farsi: "سلام، می‌خواهم این فرم را پست کنم.",
                         response: {
-                            speaker: "clerk",
+                            speaker: "hassan",
                             farsi: "بله، البته. اجازه بدهید فرم را ببینم.",
-                            english: "Yes, of course. Let me see the form.",
-                            emotion: "helpful"
+                            english: "Yes, of course. Let me see the form."
                         },
-                        next_id: "002"
+                        next_id: "2"
                     },
                     {
                         english: "(Show the form without speaking)",
                         farsi: "(بدون حرف زدن، فرم را نشان می‌دهید)",
                         response: {
-                            speaker: "clerk",
+                            speaker: "hassan",
                             farsi: "آه، فرم مدرسه زبان. باید این قسمت‌ها را پر کنید.",
-                            english: "Ah, the language school form. You'll need to fill out these sections.",
-                            emotion: "understanding"
+                            english: "Ah, the language school form. You'll need to fill out these sections."
                         },
-                        next_id: "002"
+                        next_id: "2"
                     }
-                ],
-                emotion: "professional",
-                typing_speed: "normal"
+                ]
             },
-            "002": {
-                speaker: "clerk",
+            "2": {
+                speaker: "hassan",
                 farsi: "لطفاً نام و آدرس خود را اینجا بنویسید.",
                 english: "Please write your name and address here.",
                 choices: [
@@ -201,290 +195,156 @@ const storyData = {
                         english: "Could you help me with the Farsi writing?",
                         farsi: "می‌توانید در نوشتن فارسی کمکم کنید؟",
                         response: {
-                            speaker: "clerk",
-                            farsi: "بله، حتماً. بگذارید توضیح بدهم...",
-                            english: "Yes, certainly. Let me explain...",
-                            emotion: "helpful",
-                            typing_speed: "slow"
+                            speaker: "hassan",
+                            farsi: "البته! من کمکتان می‌کنم.",
+                            english: "Of course! I'll help you."
                         },
-                        next_id: "003"
+                        next_id: "3"
                     }
-                ],
-                emotion: "professional",
-                typing_speed: "normal"
+                ]
             },
-            "003": {
-                speaker: "clerk",
-                farsi: "خوب، حالا باید تمبر بخرید. هزینه‌اش دو هزار تومان است.",
-                english: "Now, you'll need a stamp. That will be 2000 tomans.",
-                choices: [
-                    {
-                        english: "Here you are (hand over the money)",
-                        farsi: "بفرمایید (پول را می‌دهید)",
-                        next_id: "004"
-                    }
-                ],
-                emotion: "professional",
-                typing_speed: "normal"
+            "3": {
+                speaker: "hassan",
+                farsi: "خیلی خوب! حالا باید امضا کنید.",
+                english: "Very good! Now you need to sign here.",
+                default_next_id: "4"
             },
-            "004": {
-                speaker: "clerk",
-                farsi: "متشکرم. فرم شما فردا به مدرسه می‌رسد.",
-                english: "Thank you. Your form will reach the school tomorrow.",
-                default_next_id: "005",
-                emotion: "pleased",
-                typing_speed: "normal"
+            "4": {
+                speaker: "narrator",
+                farsi: "در طول یک روز، من با افراد مختلف فارسی صحبت کردم، به مدرسه‌ی زبان رفتم، و یک بسته پستی فرستادم!",
+                english: "In just one day, I've spoken Farsi with different people, gone to language school, and mailed a package!",
+                default_next_id: "5"
             },
-            "005": {
-                speaker: "player",
+            "5": {
+                speaker: "hassan",
                 farsi: "موفق شدید فرم را پست کنید. وقت برگشتن به خانه است.",
-                english: "You successfully mailed the form. Time to head back home.",
-                next_scene_id: "scene005",
-                emotion: "accomplished",
-                typing_speed: "normal"
+                english: "You've successfully mailed the form. Time to head home.",
+                next_scene_id: "scene005"
             }
         }
     },
-    scene005: {
+    "scene005": {
         id: "scene005",
         title: "Back Home",
         location_id: "apartment",
         character_id: "alex",
-        bgm: "main_theme",
+        bgm: "main-theme",
         dialog: {
-            "000": {
+            "0": {
                 speaker: "alex",
-                farsi: "برگشتی! چطور بود؟",
-                english: "You're back! How did it go?",
+                farsi: "هی! روز خوبی داشتی؟ بیا بریم کافه!",
+                english: "Hey! Had a good day? Let's go to the café!",
                 choices: [
                     {
-                        english: "It went well! The clerk was very helpful.",
-                        farsi: "خوب بود! کارمند خیلی کمک کرد.",
-                        response: {
-                            speaker: "alex",
-                            farsi: "عالیه! راستی، می‌خوای بریم کافه؟",
-                            english: "Great! Hey, want to go to the café?",
-                            emotion: "excited"
-                        },
-                        next_id: "001"
+                        english: "Yes, let's go!",
+                        farsi: "بله، بریم!",
+                        next_scene_id: "scene006"
                     },
                     {
-                        english: "It was a bit challenging, but I managed.",
-                        farsi: "یک کم سخت بود، ولی موفق شدم.",
-                        response: {
-                            speaker: "alex",
-                            farsi: "مهم نیست، کم کم بهتر می‌شه. بریم کافه؟",
-                            english: "Don't worry, it gets easier. Want to go to the café?",
-                            emotion: "supportive"
-                        },
-                        next_id: "001"
+                        english: "Sure, I could use some coffee.",
+                        farsi: "حتماً، یه قهوه می‌چسبه.",
+                        next_scene_id: "scene006"
                     }
-                ],
-                emotion: "curious",
-                typing_speed: "normal"
-            },
-            "001": {
-                speaker: "alex",
-                farsi: "کافه‌ای می‌شناسم که باریستا فارسی عالی حرف می‌زنه!",
-                english: "I know a café where the barista speaks great Farsi!",
-                next_scene_id: "scene006",
-                emotion: "enthusiastic",
-                typing_speed: "excited"
+                ]
             }
         }
     },
-    scene006: {
+    "scene006": {
         id: "scene006",
         title: "The Café",
         location_id: "cafe",
-        character_id: "barista",
-        bgm: "cafe_ambience",
+        character_id: "maryam",
+        bgm: "cafe-ambience",
         dialog: {
-            "000": {
-                speaker: "player",
+            "0": {
+                speaker: "narrator",
                 farsi: "شما و الکس وارد یک کافه دنج می‌شوید. بوی قهوه تازه در فضا پیچیده است.",
                 english: "You and Alex enter a cozy café. The aroma of fresh coffee fills the air.",
-                default_next_id: "001",
-                emotion: "neutral",
-                typing_speed: "normal",
-                sfx: "door_bell"
+                default_next_id: "1"
             },
-            "001": {
-                speaker: "barista",
+            "1": {
+                speaker: "maryam",
                 farsi: "سلام، خوش آمدید!",
                 english: "Hello, welcome!",
-                default_next_id: "002",
-                emotion: "friendly",
-                typing_speed: "excited"
+                default_next_id: "2"
             },
-            "002": {
+            "2": {
                 speaker: "alex",
-                farsi: "سلام رضا! ایشون دوست جدیدم هستن که تازه به ایران اومدن.",
-                english: "Hi Reza! This is my new friend who just moved to Iran.",
-                default_next_id: "003",
-                emotion: "excited",
-                typing_speed: "normal"
+                farsi: "سلام مریم! حال شما چطوره؟",
+                english: "Hi Maryam! How are you?",
+                default_next_id: "3"
             },
-            "003": {
-                speaker: "barista",
-                farsi: "خیلی خوش اومدین! چی میل دارین؟",
-                english: "Very welcome! What would you like to have?",
+            "3": {
+                speaker: "maryam",
+                farsi: "خوبم، ممنون! چی میل دارید؟",
+                english: "I'm good, thanks! What would you like?",
                 choices: [
                     {
-                        english: "Could you explain the menu in Farsi?",
-                        farsi: "می‌تونید منو رو به فارسی توضیح بدید؟",
+                        english: "A latte, please.",
+                        farsi: "یک لاته، لطفاً.",
                         response: {
-                            speaker: "barista",
-                            farsi: "البته! ببینید، ما قهوه‌های مختلف داریم...",
-                            english: "Of course! Look, we have different types of coffee...",
-                            emotion: "helpful",
-                            typing_speed: "slow",
-                            sfx: "paper_rustle"
+                            speaker: "maryam",
+                            farsi: "بفرمایید، دو تا لاته. نوش جان!",
+                            english: "Here you are, two lattes. Enjoy!"
                         },
-                        next_id: "004"
+                        next_id: "4"
                     },
                     {
-                        english: "I'll have what Alex is having",
-                        farsi: "همون چیزی که الکس سفارش میده",
+                        english: "What do you recommend?",
+                        farsi: "چی پیشنهاد می‌کنید؟",
                         response: {
-                            speaker: "barista",
-                            farsi: "دو تا لاته با شیر بادام، درسته؟",
-                            english: "Two almond milk lattes, right?",
-                            emotion: "friendly",
-                            typing_speed: "normal"
+                            speaker: "maryam",
+                            farsi: "دمنوش مخصوص ما عالیه!",
+                            english: "Our special herbal tea is excellent!"
                         },
-                        next_id: "005"
+                        next_id: "4"
                     }
-                ],
-                emotion: "friendly",
-                typing_speed: "normal"
+                ]
             },
-            "004": {
-                speaker: "barista",
-                farsi: "قهوه ترک، اسپرسو، لاته، کاپوچینو... و البته دمنوش‌های سنتی ایرانی هم داریم.",
-                english: "Turkish coffee, espresso, latte, cappuccino... and of course, we have traditional Iranian herbal teas.",
-                choices: [
-                    {
-                        english: "I'd like to try the Iranian tea",
-                        farsi: "می‌خوام دمنوش ایرانی رو امتحان کنم",
-                        response: {
-                            speaker: "barista",
-                            farsi: "انتخاب خوبیه! دمنوش زعفران و گل محمدی براتون میارم.",
-                            english: "Great choice! I'll bring you saffron and rose tea.",
-                            emotion: "pleased",
-                            typing_speed: "normal",
-                            sfx: "pour_tea"
-                        },
-                        next_id: "006"
-                    }
-                ],
-                emotion: "helpful",
-                typing_speed: "normal"
-            },
-            "005": {
-                speaker: "barista",
-                farsi: "بفرمایید، دو تا لاته. نوش جان!",
-                english: "Here you are, two lattes. Enjoy!",
-                default_next_id: "007",
-                emotion: "pleased",
-                typing_speed: "normal",
-                sfx: "coffee_machine"
-            },
-            "006": {
-                speaker: "barista",
-                farsi: "بفرمایید، دمنوش مخصوص ما. نوش جان!",
-                english: "Here's our special herbal tea. Enjoy!",
-                default_next_id: "007",
-                emotion: "pleased",
-                typing_speed: "normal",
-                sfx: "pour_tea"
-            },
-            "007": {
+            "4": {
                 speaker: "alex",
-                farsi: "راستی، رضا خیلی خوب فارسی درس میده. شاید بتونه بهت کمک کنه.",
-                english: "By the way, Reza is a great Farsi teacher. Maybe he can help you.",
-                default_next_id: "008",
-                emotion: "supportive",
-                typing_speed: "normal"
+                farsi: "خب، تعریف کن. روز اول چطور بود؟",
+                english: "So, tell me. How was your first day?",
+                default_next_id: "5"
             },
-            "008": {
-                speaker: "barista",
-                farsi: "با کمال میل! هر وقت اومدی کافه، می‌تونیم تمرین کنیم.",
-                english: "I'd be happy to! Whenever you come to the café, we can practice.",
-                default_next_id: "009",
-                emotion: "enthusiastic",
-                typing_speed: "normal"
-            },
-            "009": {
-                speaker: "player",
-                farsi: "خیلی ممنون! من بعداً برمی‌گردم.",
-                english: "Thank you very much! I'll come back later.",
-                default_next_id: "010",
-                emotion: "happy",
-                typing_speed: "normal"
-            },
-            "010": {
-                speaker: "alex",
-                farsi: "خب، باید برگردیم به خانه. روز پر مشغله‌ای بود!",
-                english: "Well, we should head back home. It's been a busy day!",
-                default_next_id: "011",
-                emotion: "satisfied",
-                typing_speed: "normal"
-            },
-            "011": {
-                speaker: "player",
-                farsi: "در طول یک روز، من با افراد مختلف فارسی صحبت کردم، به مدرسه‌ی زبان رفتم، و یک بسته پستی فرستادم!",
-                english: "In just one day, I spoke Farsi with different people, went to language school, and mailed a package!",
-                default_next_id: "012",
-                typing_speed: "normal"
-            },
-            "012": {
-                speaker: "alex",
-                farsi: "تو خیلی سریع یاد می‌گیری! فردا چیزهای بیشتری یاد خواهی گرفت.",
-                english: "You're learning so quickly! Tomorrow you'll learn even more.",
-                next_scene_id: "scene001",
-                emotion: "excited",
-                typing_speed: "normal"
+            "5": {
+                speaker: "narrator",
+                farsi: "شما درباره‌ی تجربیات روز اول خود صحبت می‌کنید...",
+                english: "You talk about your experiences from the first day...",
+                next_scene_id: "scene007"
             }
         }
     },
-    scene007: {
+    "scene007": {
         id: "scene007",
         title: "The End",
         location_id: "apartment",
-        character_id: "player",
-        bgm: "main_theme",
+        character_id: "alex",
+        bgm: "main-theme",
         dialog: {
-            "000": {
-                speaker: "player",
+            "0": {
+                speaker: "narrator",
                 farsi: "شما به خانه برگشتید. روز پر از تجربه و یادگیری بود.",
-                english: "You returned home. It was a day full of experience and learning.",
-                default_next_id: "001",
-                emotion: "happy",
-                typing_speed: "normal"
+                english: "You return home. It was a day full of experiences and learning.",
+                default_next_id: "1"
             },
-            "001": {
-                speaker: "player",
+            "1": {
+                speaker: "narrator",
                 farsi: "شما به خودتان می‌گویید که فردا هم روز خوبی خواهد بود.",
-                english: "You tell yourself that tomorrow will be a great day too.",
-                default_next_id: "002",
-                emotion: "positive",
-                typing_speed: "normal"
+                english: "You tell yourself that tomorrow will be another good day.",
+                default_next_id: "2"
             },
-            "002": {
-                speaker: "player",
+            "2": {
+                speaker: "narrator",
                 farsi: "شما به خواب می‌روید و منتظر فردا هستید.",
-                english: "You go to sleep, looking forward to tomorrow.",
-                default_next_id: "003",
-                emotion: "relaxed",
-                typing_speed: "normal"
+                english: "You drift off to sleep, looking forward to tomorrow.",
+                default_next_id: "3"
             },
-            "003": {
-                speaker: "player",
+            "3": {
+                speaker: "narrator",
                 farsi: "پایان.",
                 english: "The End.",
-                emotion: "neutral",
-                typing_speed: "normal"
+                next_scene_id: "scene001"
             }
         }
     }

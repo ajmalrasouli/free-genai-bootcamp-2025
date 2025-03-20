@@ -3,55 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farsi Learning Visual Novel</title>
+    <title>Farsi Visual Novel</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles/main.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Naskh+Arabic&display=swap" rel="stylesheet">
-    <style>
-        /* Fix CSS appearance property */
-        #dialogue-box {
-            appearance: none;
-        }
-    </style>
 </head>
 <body>
     <div id="game-container">
         <div id="scene">
             <div id="background"></div>
             <div id="character"></div>
-            <div id="dialogue-box">
-                <div id="character-name"></div>
-                <div id="dialogue-text"></div>
-                <div id="click-hint">Click to continue...</div>
+            <div id="dialog-box">
+                <div id="farsi-text" class="farsi-text" dir="rtl"></div>
+                <div id="english-text" class="english-text"></div>
             </div>
-            <div id="choices"></div>
+            <div id="choices-container"></div>
+        </div>
+        
+        <!-- Audio Controls -->
+        <div id="audio-controls" class="audio-controls">
+            <div class="volume-control">
+                <label for="bgm-volume">BGM:</label>
+                <input type="range" id="bgm-volume" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div class="volume-control">
+                <label for="sfx-volume">SFX:</label>
+                <input type="range" id="sfx-volume" min="0" max="1" step="0.1" value="0.7">
+            </div>
+            <div class="volume-control">
+                <label for="dialog-volume">Dialog:</label>
+                <input type="range" id="dialog-volume" min="0" max="1" step="0.1" value="1.0">
+            </div>
+        </div>
+
+        <!-- Save/Load Menu -->
+        <div id="save-load-menu" class="save-load-menu hidden">
+            <div class="save-slots"></div>
+        </div>
+
+        <!-- Game Menu -->
+        <div id="game-menu" class="game-menu">
+            <button id="save-button">Save</button>
+            <button id="load-button">Load</button>
+            <button id="settings-button">Settings</button>
         </div>
     </div>
-    <div id="audio-controls">
-        <div class="volume-control">
-            <label for="bgm-volume">BGM Volume</label>
-            <input type="range" id="bgm-volume" min="0" max="1" step="0.1" value="0.3">
-        </div>
-        <div class="volume-control">
-            <label for="sfx-volume">SFX Volume</label>
-            <input type="range" id="sfx-volume" min="0" max="1" step="0.1" value="0.5">
-        </div>
-    </div>
+
     <!-- Libraries -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <!-- Game Scripts -->
+    <script src="js/maps.js"></script>
     <script src="js/story-data.js"></script>
     <script src="js/audio-manager.js"></script>
     <script src="js/save-manager.js"></script>
     <script src="js/engine.js"></script>
     <script src="js/scenes.js"></script>
     <script src="js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            window.visualNovelEngine = new VisualNovelEngine();
-            window.visualNovelEngine.start();
-        });
-    </script>
 </body>
 </html>

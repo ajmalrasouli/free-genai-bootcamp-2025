@@ -1,489 +1,305 @@
 class VisualNovelEngine {
     constructor() {
+        this.currentScene = null;
+        this.currentDialogId = "0";
+        this.currentDialogData = null;
+        this.audioManager = new AudioManager();
+        this.saveManager = new SaveManager();
+        this.isChoiceActive = false;
+        this.gameFlags = {};
+        
+        // Initialize UI elements
+        this.initializeDOMElements();
+        this.setupClickHandlers();
+        this.setupVolumeControls();
+        this.initializeAudioSettings();
+    }
+
+    initializeDOMElements() {
+        // Get DOM elements
         this.background = document.getElementById('background');
         this.character = document.getElementById('character');
-        this.characterName = document.getElementById('character-name');
-        this.dialogueText = document.getElementById('dialogue-text');
-        this.choicesContainer = document.getElementById('choices');
-        
-        this.currentScene = null;
-        this.currentDialogId = null;
-        this.currentState = {
-            flags: {},
-            inventory: [],
-            relationships: {}
-        };
-        
-        // Bind click handler to advance dialogue
-        document.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('choice')) {
-                this.advance();
-            }
-        });
-
-        // Add language toggle button
-        this.addLanguageToggle();
-        this.currentLanguage = 'english'; // Default to English
-        this.isTyping = false;
-        
-        // Initialize audio manager
-        window.audioManager = new AudioManager();
-        
-        // Initialize save manager
-        window.saveManager = new SaveManager();
-        window.saveManager.createSaveLoadUI();
+        this.dialogBox = document.getElementById('dialog-box');
+        this.farsiText = document.getElementById('farsi-text');
+        this.englishText = document.getElementById('english-text');
+        this.choicesContainer = document.getElementById('choices-container');
         
         // Add save/load button
-        this.addSaveLoadButton();
+        const menuButton = document.createElement('button');
+        menuButton.id = 'menu-button';
+        menuButton.textContent = 'Save/Load';
+        menuButton.onclick = () => this.saveManager.toggleSaveLoadMenu();
+        document.getElementById('game-container').appendChild(menuButton);
         
-        // Initialize audio controls
-        this.initializeAudioControls();
-        
-        this.typingSpeed = {
-            slow: 100,
-            normal: 50,
-            excited: 30,
-            instant: 0
-        };
-    }
-
-    addLanguageToggle() {
-        const toggle = document.createElement('button');
-        toggle.id = 'language-toggle';
-        toggle.textContent = 'Switch to Farsi';
-        toggle.style.position = 'absolute';
-        toggle.style.top = '10px';
-        toggle.style.right = '10px';
-        toggle.style.padding = '8px 16px';
-        toggle.style.backgroundColor = '#4CAF50';
-        toggle.style.color = 'white';
-        toggle.style.border = 'none';
-        toggle.style.borderRadius = '4px';
-        toggle.style.cursor = 'pointer';
-        
-        toggle.addEventListener('click', () => {
-            this.currentLanguage = this.currentLanguage === 'english' ? 'farsi' : 'english';
-            toggle.textContent = this.currentLanguage === 'english' ? 'Switch to Farsi' : 'Switch to English';
-            
-            // Apply language-specific styling
-            const isFarsi = this.currentLanguage === 'farsi';
-            document.documentElement.lang = isFarsi ? 'fa' : 'en';
-            
-            // Update dialogue text direction
-            const dialogueText = document.getElementById('dialogue-text');
-            dialogueText.style.direction = isFarsi ? 'rtl' : 'ltr';
-            dialogueText.style.textAlign = isFarsi ? 'right' : 'left';
-            
-            // Update click hint text based on language
-            const clickHint = document.getElementById('click-hint');
-            clickHint.textContent = isFarsi ? 'برای ادامه کلیک کنید...' : 'Click to continue...';
-            clickHint.style.direction = isFarsi ? 'rtl' : 'ltr';
-            clickHint.style.textAlign = 'center';
-            
-            // Add Farsi font to character name
-            const characterName = document.getElementById('character-name');
-            if (isFarsi) {
-                characterName.style.fontFamily = "'Noto Naskh Arabic', serif";
-                characterName.style.direction = 'rtl';
-                characterName.style.textAlign = 'right';
-            } else {
-                characterName.style.fontFamily = "'Noto Sans', Arial, sans-serif";
-                characterName.style.direction = 'ltr';
-                characterName.style.textAlign = 'left';
-            }
-            
-            // Update the dialogue display
-            this.updateDialogueDisplay();
-            
-            // Also update character name
-            if (this.currentDialogData) {
-                const characterNames = {
-                    'player': this.currentLanguage === 'english' ? 'You' : 'شما',
-                    'alex': this.currentLanguage === 'english' ? 'Alex Thompson' : 'الکس تامپسون',
-                    'teacher': this.currentLanguage === 'english' ? 'Dr. Fatima Ahmadi' : 'دکتر فاطمه احمدی',
-                    'student1': this.currentLanguage === 'english' ? 'Park Ji-eun' : 'پارک جی-اون',
-                    'student2': this.currentLanguage === 'english' ? 'Garcia Carlos' : 'گارسیا کارلوس',
-                    'clerk': this.currentLanguage === 'english' ? 'Ali Hosseini' : 'علی حسینی',
-                    'barista': this.currentLanguage === 'english' ? 'Reza' : 'رضا'
-                };
-                this.characterName.textContent = characterNames[this.currentDialogData.speaker] || '';
-            }
-            
-            // Update any displayed choices
-            if (this.currentDialogData && this.currentDialogData.choices) {
-                this.showChoices(this.currentDialogData.choices);
-            }
-        });
-        
-        document.getElementById('game-container').appendChild(toggle);
-    }
-
-    addSaveLoadButton() {
-        const button = document.createElement('button');
-        button.id = 'save-load-button';
-        button.textContent = 'Save/Load';
-        button.onclick = () => window.saveManager.toggleSaveLoadMenu(true);
-        document.getElementById('game-container').appendChild(button);
-    }
-
-    initializeAudioControls() {
-        const bgmSlider = document.getElementById('bgm-volume');
-        const sfxSlider = document.getElementById('sfx-volume');
-        
-        if (!bgmSlider || !sfxSlider) {
-            console.error('Volume sliders not found in the DOM');
-            return;
+        // Add volume controls if they don't exist
+        if (!document.getElementById('volume-controls')) {
+            const volumeControls = document.createElement('div');
+            volumeControls.id = 'volume-controls';
+            volumeControls.innerHTML = `
+                <div class="volume-control">
+                    <label for="bgm-volume">BGM</label>
+                    <input type="range" id="bgm-volume" min="0" max="1" step="0.1" value="0.5">
+                </div>
+                <div class="volume-control">
+                    <label for="sfx-volume">SFX</label>
+                    <input type="range" id="sfx-volume" min="0" max="1" step="0.1" value="0.7">
+                </div>
+                <div class="volume-control">
+                    <label for="dialog-volume">Dialog</label>
+                    <input type="range" id="dialog-volume" min="0" max="1" step="0.1" value="1.0">
+                </div>
+            `;
+            document.getElementById('game-container').appendChild(volumeControls);
         }
+    }
+
+    initializeAudioSettings() {
+        // Set initial volume levels
+        this.audioManager.setVolume('bgm', 0.5);
+        this.audioManager.setVolume('sfx', 0.7);
+        this.audioManager.setVolume('dialog', 1.0);
         
-        // Set initial values
-        bgmSlider.value = window.audioManager.bgmVolume;
-        sfxSlider.value = window.audioManager.sfxVolume;
-        
-        // BGM volume control
-        bgmSlider.addEventListener('input', (e) => {
+        // Set initial volume control values
+        document.getElementById('bgm-volume').value = 0.5;
+        document.getElementById('sfx-volume').value = 0.7;
+        document.getElementById('dialog-volume').value = 1.0;
+
+        // Start with main theme
+        this.audioManager.playBGM('main-theme.mp3');
+    }
+
+    setupVolumeControls() {
+        const bgmVolume = document.getElementById('bgm-volume');
+        const sfxVolume = document.getElementById('sfx-volume');
+        const dialogVolume = document.getElementById('dialog-volume');
+
+        bgmVolume.addEventListener('input', (e) => {
             const volume = parseFloat(e.target.value);
-            window.audioManager.setVolume('bgm', volume);
-            
-            // Update current BGM volume if playing
-            if (window.audioManager.bgm) {
-                window.audioManager.bgm.volume = volume;
-            }
+            this.audioManager.setVolume('bgm', volume);
         });
-        
-        // SFX volume control
-        sfxSlider.addEventListener('input', (e) => {
+
+        sfxVolume.addEventListener('input', (e) => {
             const volume = parseFloat(e.target.value);
-            window.audioManager.setVolume('sfx', volume);
-            
+            this.audioManager.setVolume('sfx', volume);
             // Play a test sound when adjusting SFX volume
             if (volume > 0) {
-                window.audioManager.playSFX('button_click');
+                this.audioManager.playSFX('button-click.mp3');
             }
         });
-    }
 
-    createDialogueBox() {
-        const dialogueBox = document.createElement('div');
-        dialogueBox.id = 'dialogue-box';
-        dialogueBox.classList.add('dialogue-box');
-        
-        this.characterName = document.createElement('div');
-        this.characterName.id = 'character-name';
-        
-        this.dialogueText = document.createElement('div');
-        this.dialogueText.id = 'dialogue-text';
-        
-        const clickHint = document.createElement('div');
-        clickHint.id = 'click-hint';
-        clickHint.textContent = 'Click to continue...';
-        
-        dialogueBox.appendChild(this.characterName);
-        dialogueBox.appendChild(this.dialogueText);
-        dialogueBox.appendChild(clickHint);
-        
-        dialogueBox.addEventListener('click', () => {
-            this.handleDialogueClick();
+        dialogVolume.addEventListener('input', (e) => {
+            const volume = parseFloat(e.target.value);
+            this.audioManager.setVolume('dialog', volume);
         });
-        
-        return dialogueBox;
     }
 
-    async setBackground(locationId) {
-        const backgroundMap = {
-            'apartment': 'assets/backgrounds/apartment.jpg',
-            'school_exterior': 'assets/backgrounds/school-exterior.jpg',
-            'classroom': 'assets/backgrounds/classroom.jpg',
-            'post_office': 'assets/backgrounds/post-office.jpg',
-            'cafe': 'assets/backgrounds/cafe-interior.jpg'
-        };
-
-        const imagePath = backgroundMap[locationId];
-        if (!imagePath) {
-            this.background.style.backgroundImage = '';
-            return;
-        }
-        
-        this.background.style.opacity = '0';
-        await new Promise(resolve => setTimeout(resolve, 300));
-        this.background.style.backgroundImage = `url(${imagePath})`;
-        this.background.style.opacity = '1';
-    }
-
-    async setCharacter(characterId) {
-        const characterMap = {
-            'alex': 'assets/characters/alex.png',
-            'teacher': 'assets/characters/teacher.png',
-            'student1': 'assets/characters/student1.png',
-            'student2': 'assets/characters/student2.png',
-            'clerk': 'assets/characters/clerk.png'
-        };
-
-        if (characterId === 'none') {
-            this.character.style.display = 'none';
-            return;
-        }
-
-        const imagePath = characterMap[characterId];
-        if (!imagePath) {
-            this.character.style.backgroundImage = '';
-            return;
-        }
-        
-        this.character.style.opacity = '0';
-        await new Promise(resolve => setTimeout(resolve, 300));
-        this.character.style.backgroundImage = `url(${imagePath})`;
-        this.character.style.opacity = '1';
-
-        // Apply emotional state if present
-        if (this.currentDialogData && this.currentDialogData.emotion) {
-            this.applyEmotionalState(this.currentDialogData.emotion);
-        }
-    }
-
-    applyEmotionalState(emotion) {
-        // Remove any existing emotion classes
-        const emotionClasses = ['neutral', 'happy', 'sad', 'excited', 'professional', 'helpful', 'understanding', 'supportive', 'curious', 'enthusiastic'];
-        this.character.classList.remove(...emotionClasses);
-        
-        // Add new emotion class
-        this.character.classList.add(emotion);
-
-        // Apply visual effects based on emotion
-        switch (emotion) {
-            case 'excited':
-            case 'enthusiastic':
-                this.character.style.transform = 'scale(1.05)';
-                break;
-            case 'helpful':
-            case 'understanding':
-                this.character.style.filter = 'brightness(1.1)';
-                break;
-            case 'professional':
-                this.character.style.filter = 'contrast(1.1)';
-                break;
-            default:
-                this.character.style.transform = '';
-                this.character.style.filter = '';
-        }
-    }
-
-    async typeText(text, speed) {
-        this.isTyping = true;
-        this.dialogueText.textContent = ''; // Clear previous text
-        const delay = this.typingSpeed[speed] || this.typingSpeed.normal;
-        
-        if (delay === 0) {
-            this.dialogueText.textContent = text;
-            this.isTyping = false;
-            return;
-        }
-
-        // Add each character with a delay
-        for (let i = 0; i < text.length; i++) {
-            if (!this.isTyping) break;
-            this.dialogueText.textContent = text.substring(0, i+1); // Use substring instead of appending
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-        this.isTyping = false;
-    }
-
-    skipTyping() {
-        this.isTyping = false;
-        if (this.currentDialogData) {
-            this.dialogueText.textContent = this.currentDialogData[this.currentLanguage];
-        }
-    }
-
-    async setDialogue(dialogData) {
-        this.currentDialogData = dialogData;
-        
-        // Simple character name mapping
-        const characterNames = {
-            'player': this.currentLanguage === 'english' ? 'You' : 'شما',
-            'alex': this.currentLanguage === 'english' ? 'Alex Thompson' : 'الکس تامپسون',
-            'teacher': this.currentLanguage === 'english' ? 'Dr. Fatima Ahmadi' : 'دکتر فاطمه احمدی',
-            'student1': this.currentLanguage === 'english' ? 'Park Ji-eun' : 'پارک جی-اون',
-            'student2': this.currentLanguage === 'english' ? 'Garcia Carlos' : 'گارسیا کارلوس',
-            'clerk': this.currentLanguage === 'english' ? 'Ali Hosseini' : 'علی حسینی',
-            'barista': this.currentLanguage === 'english' ? 'Reza' : 'رضا'
-        };
-
-        this.characterName.textContent = characterNames[dialogData.speaker] || '';
-        
-        // Apply emotional state if present
-        if (dialogData.emotion) {
-            this.applyEmotionalState(dialogData.emotion);
-        }
-
-        // Play SFX if specified
-        if (dialogData.sfx) {
-            window.audioManager.playSFX(dialogData.sfx);
-        }
-
-        // Type out the text with specified speed
-        await this.typeText(
-            dialogData[this.currentLanguage],
-            dialogData.typing_speed || 'normal'
-        );
-    }
-
-    updateDialogueDisplay(dialogData = null) {
-        if (!dialogData) {
-            dialogData = storyData[this.currentScene].dialog[this.currentDialogId];
-        }
-        this.currentDialogData = dialogData;
-        
-        // Update character name when language changes
-        const characterNames = {
-            'player': this.currentLanguage === 'english' ? 'You' : 'شما',
-            'alex': this.currentLanguage === 'english' ? 'Alex Thompson' : 'الکس تامپسون',
-            'teacher': this.currentLanguage === 'english' ? 'Dr. Fatima Ahmadi' : 'دکتر فاطمه احمدی',
-            'student1': this.currentLanguage === 'english' ? 'Park Ji-eun' : 'پارک جی-اون',
-            'student2': this.currentLanguage === 'english' ? 'Garcia Carlos' : 'گارسیا کارلوس',
-            'clerk': this.currentLanguage === 'english' ? 'Ali Hosseini' : 'علی حسینی',
-            'barista': this.currentLanguage === 'english' ? 'Reza' : 'رضا'
-        };
-        
-        this.characterName.textContent = characterNames[dialogData.speaker] || '';
-        
-        // Set click hint text based on language
-        const clickHint = document.getElementById('click-hint');
-        clickHint.textContent = this.currentLanguage === 'farsi' ? 'برای ادامه کلیک کنید...' : 'Click to continue...';
-
-        // Skip any current typing animation
-        this.skipTyping();
-        
-        // Start new typing animation
-        this.typeText(
-            dialogData[this.currentLanguage],
-            dialogData.typing_speed || 'normal'
-        );
-        
-        // Update choices if present
-        if (dialogData.choices) {
-            this.showChoices(dialogData.choices);
-        } else {
-            this.choicesContainer.innerHTML = '';
-        }
-    }
-
-    showChoices(choices) {
-        this.choicesContainer.innerHTML = '';
-        if (!choices || choices.length === 0) return;
-
-        choices.forEach(choice => {
-            const button = document.createElement('div');
-            button.classList.add('choice');
-            
-            // Set text in the current language
-            button.textContent = choice[this.currentLanguage];
-            
-            // Apply Farsi styling to choices
-            if (this.currentLanguage === 'farsi') {
-                button.style.fontFamily = "'Noto Naskh Arabic', serif";
-                button.style.direction = 'rtl';
-                button.style.textAlign = 'right';
-            } else {
-                button.style.fontFamily = "'Noto Sans', Arial, sans-serif";
-                button.style.direction = 'ltr';
-                button.style.textAlign = 'left';
+    setupClickHandlers() {
+        // Dialog box click handler for advancing text
+        this.dialogBox.addEventListener('click', () => {
+            if (!this.isChoiceActive) {
+                this.advanceDialog();
             }
-            
-            button.addEventListener('click', () => {
-                this.handleChoice(choice);
-            });
-            this.choicesContainer.appendChild(button);
         });
-    }
 
-    handleChoice(choice) {
-        if (choice.response) {
-            this.setDialogue(choice.response);
-            setTimeout(() => {
-                if (choice.next_id) {
-                    this.currentDialogId = choice.next_id;
-                    this.updateDialogueDisplay();
-                } else if (choice.next_scene_id) {
-                    this.loadScene(choice.next_scene_id);
+        // Add keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (!this.isChoiceActive) {
+                    this.advanceDialog();
                 }
-            }, 2000); // Wait 2 seconds before advancing after response
-        } else {
-            if (choice.next_id) {
-                this.currentDialogId = choice.next_id;
-                this.updateDialogueDisplay();
-            } else if (choice.next_scene_id) {
-                this.loadScene(choice.next_scene_id);
             }
-        }
-        
-        // Play button click sound
-        window.audioManager.playSFX('button_click');
+        });
     }
 
-    async loadScene(sceneId) {
+    async loadScene(sceneId, startDialogId = "0") {
+        console.log('Loading scene:', sceneId, 'with dialog:', startDialogId);
         const scene = storyData[sceneId];
         if (!scene) {
             console.error(`Scene ${sceneId} not found`);
             return;
         }
 
-        this.currentScene = sceneId;
-        this.currentDialogId = "000"; // Start from first dialogue
+        // Stop any currently playing audio
+        await this.audioManager.playBGM(null);
 
-        await this.setBackground(scene.location_id);
-        await this.setCharacter(scene.character_id);
-        
-        // Play scene BGM if specified
-        if (storyData[sceneId].bgm) {
-            await window.audioManager.playBGM(storyData[sceneId].bgm);
+        this.currentScene = scene;
+        this.currentDialogId = startDialogId;
+
+        // Set background
+        if (scene.location_id) {
+            await this.setBackground(scene.location_id);
         }
-        
-        // Play transition sound
-        window.audioManager.playSFX('transition');
-        
-        this.setDialogue(scene.dialog[this.currentDialogId]);
+
+        // Set character
+        if (scene.character_id) {
+            await this.setCharacter(scene.character_id);
+        }
+
+        // Play BGM if specified
+        if (scene.bgm) {
+            await this.audioManager.playBGM(`${scene.bgm}.mp3`);
+        }
+
+        // Display initial dialog
+        await this.setDialogue(scene.dialog[this.currentDialogId]);
     }
 
-    advance() {
-        if (this.isTyping) {
-            this.skipTyping();
+    async setBackground(locationId) {
+        console.log('Setting background:', locationId);
+        const imagePath = locationMap[locationId];
+        if (imagePath) {
+            this.background.style.backgroundImage = `url(${imagePath})`;
+            // Play transition sound
+            await this.audioManager.playSFX('transition.mp3');
+        }
+    }
+
+    async setCharacter(characterId) {
+        console.log('Setting character:', characterId);
+        const imagePath = characterMap[characterId];
+        if (imagePath) {
+            this.character.style.backgroundImage = `url(${imagePath})`;
+        }
+    }
+
+    async setDialogue(dialogData) {
+        if (!dialogData) {
+            console.warn('No dialog data provided');
             return;
         }
 
-        if (this.choicesContainer.children.length > 0) {
-            return; // Don't advance if choices are showing
+        console.log('Setting dialogue:', dialogData);
+        this.currentDialogData = dialogData;
+        
+        // Display text
+        this.farsiText.textContent = dialogData.farsi || '';
+        this.englishText.textContent = dialogData.english || '';
+        
+        // Play dialog audio
+        if (dialogData.farsi) {
+            try {
+                await this.audioManager.playDialog(this.currentScene.id, this.currentDialogId);
+            } catch (error) {
+                console.warn(`Failed to play dialog audio for ${this.currentScene.id}_${this.currentDialogId}:`, error);
+            }
         }
 
-        const currentDialog = storyData[this.currentScene].dialog[this.currentDialogId];
-        
-        if (currentDialog.next_scene_id) {
-            this.loadScene(currentDialog.next_scene_id);
-        } else if (currentDialog.default_next_id) {
-            this.currentDialogId = currentDialog.default_next_id;
-            this.updateDialogueDisplay();
+        // Handle choices if present
+        if (dialogData.choices) {
+            this.displayChoices(dialogData.choices);
         }
     }
 
-    loadGameState(saveData) {
-        this.currentScene = saveData.currentScene;
-        this.currentDialogId = saveData.currentDialogId;
-        this.currentLanguage = saveData.currentLanguage;
+    async displayChoices(choices) {
+        console.log('Displaying choices:', choices);
+        this.isChoiceActive = true;
+        this.choicesContainer.innerHTML = '';
         
-        // Load scene and dialog
-        this.loadScene(this.currentScene);
-        this.updateDialogueDisplay(storyData[this.currentScene].dialog[this.currentDialogId]);
-        
-        // Update language
-        document.getElementById('language-toggle').textContent = 
-            this.currentLanguage === 'english' ? 'Switch to Farsi' : 'Switch to English';
+        for (let i = 0; i < choices.length; i++) {
+            const choice = choices[i];
+            const button = document.createElement('button');
+            button.className = 'choice-button';
+            
+            // Create spans for Farsi and English text
+            const farsiSpan = document.createElement('span');
+            farsiSpan.className = 'farsi-text';
+            farsiSpan.textContent = choice.farsi;
+            
+            const englishSpan = document.createElement('span');
+            englishSpan.className = 'english-text';
+            englishSpan.textContent = choice.english;
+            
+            button.appendChild(farsiSpan);
+            button.appendChild(englishSpan);
+            
+            // Add click handler
+            button.addEventListener('click', async () => {
+                // Play choice audio
+                await this.audioManager.playDialogChoice(this.currentScene.id, this.currentDialogId, i);
+                
+                // Play response audio if available
+                if (choice.response) {
+                    await this.audioManager.playDialogResponse(this.currentScene.id, this.currentDialogId, i);
+                }
+                
+                // Clear choices
+                this.isChoiceActive = false;
+                this.choicesContainer.innerHTML = '';
+                
+                if (choice.next_scene_id) {
+                    await this.loadScene(choice.next_scene_id);
+                } else if (choice.next_id) {
+                    this.currentDialogId = choice.next_id;
+                    await this.setDialogue(this.currentScene.dialog[this.currentDialogId]);
+                }
+            });
+            
+            this.choicesContainer.appendChild(button);
+        }
     }
 
-    start(initialSceneId = 'scene001') {
-        this.currentState = {
-            flags: {},
-            inventory: [],
-            relationships: {}
-        };
-        this.loadScene(initialSceneId);
+    async advanceDialog() {
+        if (!this.currentDialogData) return;
+        
+        // If there are no choices and there's a default next dialog
+        if (!this.currentDialogData.choices && this.currentDialogData.default_next_id) {
+            this.currentDialogId = this.currentDialogData.default_next_id;
+            await this.setDialogue(this.currentScene.dialog[this.currentDialogId]);
+        }
+        // If there's a next scene
+        else if (this.currentDialogData.next_scene_id) {
+            await this.loadScene(this.currentDialogData.next_scene_id);
+        }
+    }
+
+    async handleChoice(choiceIndex) {
+        if (!this.currentDialogData || !this.currentDialogData.choices) return;
+        
+        const choice = this.currentDialogData.choices[choiceIndex];
+        if (!choice) return;
+        
+        // Clear choices
+        this.isChoiceActive = false;
+        this.choicesContainer.innerHTML = '';
+        
+        // If the choice has a response, display it
+        if (choice.response) {
+            this.farsiText.textContent = choice.response.farsi || '';
+            this.englishText.textContent = choice.response.english || '';
+        }
+        
+        // Update game flags if needed
+        if (choice.flags) {
+            Object.assign(this.gameFlags, choice.flags);
+        }
+        
+        // Move to next dialog or scene
+        if (choice.next_id) {
+            if (choice.next_id.includes('scene')) {
+                await this.loadScene(choice.next_id);
+            } else {
+                this.currentDialogId = choice.next_id;
+                await this.setDialogue(this.currentScene.dialog[this.currentDialogId]);
+            }
+        }
+    }
+
+    loadGameState(state) {
+        if (state && state.currentScene && state.currentDialogId) {
+            this.loadScene(state.currentScene.id, state.currentDialogId);
+        }
     }
 }
+
+// Initialize the game when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.visualNovelEngine = new VisualNovelEngine();
+    
+    // Load saved game state or start new game
+    const savedState = window.saveManager.loadGameState();
+    if (savedState) {
+        window.visualNovelEngine.loadGameState(savedState);
+    } else {
+        window.visualNovelEngine.loadScene('scene001');
+    }
+});

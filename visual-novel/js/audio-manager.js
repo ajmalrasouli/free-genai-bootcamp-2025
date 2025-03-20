@@ -1,181 +1,204 @@
 class AudioManager {
     constructor() {
-        this.bgm = null;
-        this.currentBgm = '';
-        this.sfxVolume = 0.5;
-        this.bgmVolume = 0.3;
-        this.sounds = {};
-        this.hasInteracted = false;
-        this.pendingBgm = null;
+        this.bgmAudio = new Audio();
+        this.sfxAudio = new Audio();
+        this.dialogAudio = new Audio();
         
-        // Initialize sound effects
-        this.loadSoundEffects();
+        this.bgmVolume = 0.5;
+        this.sfxVolume = 0.7;
+        this.dialogVolume = 1.0;
         
-        // Add event listeners for user interaction
-        const interactionEvents = ['click', 'touchstart', 'keydown'];
-        interactionEvents.forEach(event => {
-            document.addEventListener(event, () => {
-                if (!this.hasInteracted) {
-                    console.log('User interaction detected, enabling audio');
-                    this.hasInteracted = true;
-                    // Try to play pending BGM
-                    if (this.pendingBgm) {
-                        console.log('Playing pending BGM:', this.pendingBgm);
-                        this.playBGM(this.pendingBgm);
-                        this.pendingBgm = null;
-                    }
-                }
-            }, { once: false });
-        });
+        this.preloadedAudio = new Map();
+        this.userInteractionDetected = false;
+        
+        // Detect first user interaction
+        document.addEventListener('click', () => {
+            console.log('User interaction detected');
+            this.userInteractionDetected = true;
+        }, { once: true });
     }
-
-    loadSoundEffects() {
-        const sfxList = {
-            'door_bell': 'assets/audio/sfx/door-bell.mp3',
-            'paper_rustle': 'assets/audio/sfx/paper-rustle.mp3',
-            'coffee_machine': 'assets/audio/sfx/coffee-machine.mp3',
-            'pour_tea': 'assets/audio/sfx/pour-tea.mp3',
-            'button_click': 'assets/audio/sfx/button-click.mp3',
-            'transition': 'assets/audio/sfx/transition.mp3'
-        };
-
-        for (const [name, path] of Object.entries(sfxList)) {
-            const audio = new Audio(path);
-            audio.volume = this.sfxVolume;
-            this.sounds[name] = audio;
+    
+    setVolume(type, volume) {
+        volume = Math.max(0, Math.min(1, volume));
+        switch(type) {
+            case 'bgm':
+                this.bgmVolume = volume;
+                this.bgmAudio.volume = volume;
+                break;
+            case 'sfx':
+                this.sfxVolume = volume;
+                this.sfxAudio.volume = volume;
+                break;
+            case 'dialog':
+                this.dialogVolume = volume;
+                this.dialogAudio.volume = volume;
+                break;
         }
     }
-
-    async playBGM(trackName) {
-        console.log('Attempting to play BGM:', trackName);
-        
-        if (this.currentBgm === trackName) {
-            console.log('BGM already playing:', trackName);
-            return;
+    
+    async preloadAudio(path) {
+        if (this.preloadedAudio.has(path)) {
+            return this.preloadedAudio.get(path);
         }
-        
-        const bgmList = {
-            'cafe_ambience': 'assets/audio/bgm/cafe-ambience.mp3',
-            'main_theme': 'assets/audio/bgm/main-theme.mp3',
-            'street_ambience': 'assets/audio/bgm/street-ambience.mp3'
-        };
-
-        if (!this.hasInteracted) {
-            console.log('User has not interacted yet, storing as pending BGM');
-            this.pendingBgm = trackName;
-            return;
-        }
-
-        if (this.bgm) {
-            console.log('Fading out current BGM');
-            try {
-                await this.fadeOut(this.bgm);
-                this.bgm.pause();
-            } catch (error) {
-                console.error('Error fading out BGM:', error);
-            }
-        }
-
-        if (!trackName || !bgmList[trackName]) {
-            console.error('Invalid BGM track name:', trackName);
-            return;
-        }
-
-        console.log('Creating new audio for BGM:', trackName);
-        this.bgm = new Audio(bgmList[trackName]);
-        this.bgm.volume = 0;
-        this.bgm.loop = true;
-        this.currentBgm = trackName;
         
         try {
-            console.log('Playing BGM with fade in');
-            const playPromise = this.bgm.play();
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        console.log('BGM playback started successfully');
-                        this.fadeIn(this.bgm);
-                    })
-                    .catch(error => {
-                        console.error('BGM playback failed:', error);
-                        // If autoplay is still prevented, store as pending
-                        if (error.name === 'NotAllowedError') {
-                            this.pendingBgm = trackName;
-                        }
-                    });
+            const audio = new Audio();
+            audio.src = path;
+            await new Promise((resolve, reject) => {
+                audio.addEventListener('canplaythrough', resolve, { once: true });
+                audio.addEventListener('error', reject, { once: true });
+                audio.load();
+            });
+            this.preloadedAudio.set(path, audio);
+            return audio;
+        } catch (error) {
+            console.warn(`Error preloading audio ${path}:`, error);
+            throw error;
+        }
+    }
+    
+    async playBGM(filename) {
+        if (!filename) {
+            this.bgmAudio.pause();
+            this.bgmAudio.currentTime = 0;
+            return;
+        }
+        
+        try {
+            const path = `assets/audio/bgm/${filename}`;
+            const audio = await this.preloadAudio(path);
+            
+            // Fade out current BGM if playing
+            if (!this.bgmAudio.paused) {
+                await this.fadeOut(this.bgmAudio);
+            }
+            
+            // Set up new BGM
+            this.bgmAudio = audio;
+            this.bgmAudio.loop = true;
+            this.bgmAudio.volume = this.bgmVolume;
+            
+            // Start playing
+            if (this.userInteractionDetected) {
+                await this.bgmAudio.play();
             }
         } catch (error) {
-            console.error('Error starting BGM playback:', error);
+            console.warn(`BGM not found: ${filename}`);
         }
     }
-
-    async fadeOut(audio, duration = 1000) {
-        if (!audio || audio.volume === 0) return;
-        
-        const steps = 20;
-        const stepTime = duration / steps;
-        const stepVolume = audio.volume / steps;
-        const startVolume = audio.volume;
-
-        for (let i = steps; i > 0; i--) {
-            audio.volume = startVolume * (i / steps);
-            await new Promise(resolve => setTimeout(resolve, stepTime));
-        }
-        
-        audio.volume = 0;
-    }
-
-    async fadeIn(audio, duration = 1000) {
-        if (!audio) return;
-        
-        const steps = 20;
-        const stepTime = duration / steps;
-        const targetVolume = this.bgmVolume;
-
-        audio.volume = 0;
-        for (let i = 1; i <= steps; i++) {
-            audio.volume = targetVolume * (i / steps);
-            await new Promise(resolve => setTimeout(resolve, stepTime));
-        }
-        
-        audio.volume = targetVolume;
-    }
-
-    playSFX(soundName) {
-        if (this.sounds[soundName]) {
-            // Clone the audio to allow multiple plays
-            const sound = this.sounds[soundName].cloneNode();
-            sound.volume = this.sfxVolume;
+    
+    async playSFX(filename) {
+        try {
+            const path = `assets/audio/sfx/${filename}`;
+            const audio = await this.preloadAudio(path);
             
-            const playPromise = sound.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.error('SFX playback failed:', error);
-                });
+            // Stop any currently playing SFX
+            this.sfxAudio.pause();
+            this.sfxAudio.currentTime = 0;
+            
+            this.sfxAudio = audio;
+            this.sfxAudio.volume = this.sfxVolume;
+            
+            if (this.userInteractionDetected) {
+                await this.sfxAudio.play();
             }
-        } else {
-            console.warn('Sound effect not found:', soundName);
+        } catch (error) {
+            console.warn(`SFX not found: ${filename}`);
         }
     }
-
-    setVolume(type, value) {
-        if (type === 'bgm') {
-            this.bgmVolume = value;
-            if (this.bgm) this.bgm.volume = value;
-        } else if (type === 'sfx') {
-            this.sfxVolume = value;
-            Object.values(this.sounds).forEach(sound => sound.volume = value);
+    
+    formatDialogId(id) {
+        // Convert single digit IDs to have leading zeros (e.g., "1" -> "001")
+        return id.padStart(3, '0');
+    }
+    
+    async stopCurrentDialog() {
+        // Stop any currently playing dialog audio
+        if (this.dialogAudio) {
+            this.dialogAudio.pause();
+            this.dialogAudio.currentTime = 0;
         }
     }
-
-    stopAll() {
-        if (this.bgm) {
-            this.bgm.pause();
-            this.bgm.currentTime = 0;
+    
+    async playDialog(sceneId, dialogId) {
+        try {
+            // Stop any currently playing dialog
+            await this.stopCurrentDialog();
+            
+            const formattedDialogId = this.formatDialogId(dialogId);
+            const filename = `${sceneId}_${formattedDialogId}.mp3`;
+            console.log('Playing dialog:', `assets/audio/dialog/${filename}`);
+            const path = `assets/audio/dialog/${filename}`;
+            const audio = await this.preloadAudio(path);
+            
+            this.dialogAudio = audio;
+            this.dialogAudio.volume = this.dialogVolume;
+            
+            if (this.userInteractionDetected) {
+                await this.dialogAudio.play();
+            }
+        } catch (error) {
+            console.warn(`Dialog audio not found: ${sceneId}_${dialogId}.mp3`);
         }
-        Object.values(this.sounds).forEach(sound => {
-            sound.pause();
-            sound.currentTime = 0;
-        });
+    }
+    
+    async playDialogChoice(sceneId, dialogId, choiceIndex) {
+        try {
+            // Stop any currently playing dialog
+            await this.stopCurrentDialog();
+            
+            const formattedDialogId = this.formatDialogId(dialogId);
+            const filename = `${sceneId}_${formattedDialogId}_choice_${choiceIndex}.mp3`;
+            console.log('Playing choice:', `assets/audio/dialog/${filename}`);
+            const path = `assets/audio/dialog/${filename}`;
+            const audio = await this.preloadAudio(path);
+            
+            this.dialogAudio = audio;
+            this.dialogAudio.volume = this.dialogVolume;
+            
+            if (this.userInteractionDetected) {
+                await this.dialogAudio.play();
+            }
+        } catch (error) {
+            console.warn(`Choice audio not found: ${sceneId}_${dialogId}_choice_${choiceIndex}.mp3`);
+        }
+    }
+    
+    async playDialogResponse(sceneId, dialogId, choiceIndex) {
+        try {
+            // Stop any currently playing dialog
+            await this.stopCurrentDialog();
+            
+            const formattedDialogId = this.formatDialogId(dialogId);
+            const filename = `${sceneId}_${formattedDialogId}_response_${choiceIndex}.mp3`;
+            console.log('Playing response:', `assets/audio/dialog/${filename}`);
+            const path = `assets/audio/dialog/${filename}`;
+            const audio = await this.preloadAudio(path);
+            
+            this.dialogAudio = audio;
+            this.dialogAudio.volume = this.dialogVolume;
+            
+            if (this.userInteractionDetected) {
+                await this.dialogAudio.play();
+            }
+        } catch (error) {
+            console.warn(`Response audio not found: ${sceneId}_${dialogId}_response_${choiceIndex}.mp3`);
+        }
+    }
+    
+    async fadeOut(audio, duration = 1000) {
+        const startVolume = audio.volume;
+        const steps = 20;
+        const volumeStep = startVolume / steps;
+        const timeStep = duration / steps;
+        
+        for (let i = steps - 1; i >= 0; i--) {
+            audio.volume = volumeStep * i;
+            await new Promise(resolve => setTimeout(resolve, timeStep));
+        }
+        
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = startVolume;
     }
 }
