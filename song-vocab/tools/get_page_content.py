@@ -63,7 +63,7 @@ def extract_lyrics_from_html(html: str, url: str) -> Dict[str, Optional[str]]:
         {"class_": re.compile(r"song-content|song-text|track-text", re.I)},
         # ID patterns
         {"id": re.compile(r"lyrics?|kashi|romaji|original", re.I)},
-        # Common Japanese lyrics sites patterns
+        # Common Farsi lyrics sites patterns
         {"class_": "lyrics_box"},  # Uta-Net
         {"class_": "hiragana"},    # J-Lyrics
         {"class_": "romaji"}       # J-Lyrics

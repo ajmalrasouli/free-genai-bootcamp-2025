@@ -39,26 +39,26 @@ class TranscriptStructurer:
 
             <question>
             Introduction:
-            [the situation setup in japanese]
+            [the situation setup in Farsi]
             
             Conversation:
-            [the dialogue in japanese]
+            [the dialogue in Farsi]
             
             Question:
-            [the question being asked in japanese]
+            [the question being asked in Farsi]
 
             Options:
-            1. [first option in japanese]
-            2. [second option in japanese]
-            3. [third option in japanese]
-            4. [fourth option in japanese]
+            1. [first option in Farsi]
+            2. [second option in Farsi]
+            3. [third option in Farsi]
+            4. [fourth option in Farsi]
             </question>
 
             Rules:
             - Only extract questions from the 問題1 section
             - Only include questions where answers can be determined from dialogue alone
             - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
+            - Do not translate any Farsi text
             - Do not include any section descriptions or other text
             - Output questions one after another with no extra text between them
             """,
@@ -86,20 +86,20 @@ class TranscriptStructurer:
 
             <question>
             Introduction:
-            [the situation setup in japanese]
+            [the situation setup in Farsi]
             
             Conversation:
-            [the dialogue in japanese]
+            [the dialogue in Farsi]
             
             Question:
-            [the question being asked in japanese]
+            [the question being asked in Farsi]
             </question>
 
             Rules:
             - Only extract questions from the 問題2 section
             - Only include questions where answers can be determined from dialogue alone
             - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
+            - Do not translate any Farsi text
             - Do not include any section descriptions or other text
             - Output questions one after another with no extra text between them
             """,
@@ -109,7 +109,7 @@ class TranscriptStructurer:
 
             <question>
             Situation:
-            [the situation in japanese where a phrase is needed]
+            [the situation in Farsi where a phrase is needed]
             
             Question:
             何と言いますか
@@ -118,7 +118,7 @@ class TranscriptStructurer:
             Rules:
             - Only extract questions from the 問題3 section
             - Ignore any practice examples (marked with 例)
-            - Do not translate any Japanese text
+            - Do not translate any Farsi text
             - Do not include any section descriptions or other text
             - Output questions one after another with no extra text between them
             """
