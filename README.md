@@ -156,19 +156,19 @@ A simple and interactive application to help users practice writing in Farsi (Pe
 *The language portal provides a comprehensive dashboard for tracking progress and accessing various learning activities.*
 
 ### 4. Persian Learning Assistant (listening-comp)
-![Persian Learning Assistant](listening-comp/reference_images/Chat with Nova.png)
-![Persian Learning Assistant](listening-comp/reference_images/Interactive Learning.png)
-![Persian Learning Assistant](listening-comp/reference_images/RAG Implementation.png)
-![Persian Learning Assistant](listening-comp/reference_images/Raw Transcript.png)
-![Persian Learning Assistant](listening-comp/reference_images/Structured Data.png)
-![Persian Learning Assistant](listening-comp/reference_images/Listening Comp Video.mp4)
+![Persian Learning Assistant](listening-comp/reference_images/Chat_with_Nova.png)
+![Persian Learning Assistant](listening-comp/reference_images/Interactive_Learning.png)
+![Persian Learning Assistant](listening-comp/reference_images/RAG_Implementation.png)
+![Persian Learning Assistant](listening-comp/reference_images/Raw_Transcript.png)
+![Persian Learning Assistant](listening-comp/reference_images/Structured_Data.png)
+[Visual Novel Demo Video](listening-comp/reference_images/Listening_Comp_Video.mp4) (download to view)
 
 *The listening comprehension tool analyzes Persian audio and provides vocabulary extraction and grammar pattern recognition.*
 
 ### 5. Text-to-Speech (TTS) Microservice (opea-comps)
 ![TTS Microservice](opea-comps/reference_images/image1.png)
 ![TTS Microservice](opea-comps/reference_images/image2.png)
-![TTS Microservice](opea-comps/reference_images/image3png)
+
 *The TTS microservice architecture demonstrates the containerized services working together to provide text-to-speech conversion.*
 
 ### 6. Farsi Song Vocabulary Generator (song-vocab)
@@ -179,7 +179,8 @@ A simple and interactive application to help users practice writing in Farsi (Pe
 ![Visual Novel](visual-novel/reference_images/apartment.png)
 ![Visual Novel](visual-novel/reference_images/cafe.png)
 ![Visual Novel](visual-novel/reference_images/postoffice.png)
-![Visual Novel](visual-novel/reference_images/school exterior.png)
+![Visual Novel](visual-novel/reference_images/school_exterior.png)
+[Visual Novel Demo Video](visual-novel/reference_images/video.mp4) (download to view)
 
 *The visual novel presents interactive scenarios with characters and dialogue choices to teach Farsi in context.*
 
