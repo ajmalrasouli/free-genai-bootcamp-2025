@@ -259,5 +259,11 @@ def create_ui():
     return interface
 
 if __name__ == "__main__":
+    import os
     interface = create_ui()
-    interface.launch()
+    # Get host and port from environment variables or use defaults
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", 8002))
+    
+    print(f"Starting ASL Finger Spelling app on {host}:{port}")
+    interface.launch(server_name=host, server_port=port, share=False)

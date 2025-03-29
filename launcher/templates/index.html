@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Learning Platform Launcher</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8">GenAI Learning Platform</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for project_id, project in projects.items() %}
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">{{ project.name }}</h2>
+                <p class="text-gray-600 mb-4">Port: {{ project.port }}</p>
+                <div class="flex space-x-4">
+                    <button 
+                        onclick="startProject('{{ project_id }}')"
+                        class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
+                        Start
+                    </button>
+                    <button 
+                        onclick="stopProject('{{ project_id }}')"
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors">
+                        Stop
+                    </button>
+                    <a 
+                        href="http://localhost:{{ project.port }}" 
+                        target="_blank"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                        Open
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        async function startProject(projectId) {
+            try {
+                const response = await fetch(`/start/${projectId}`, {
+                    method: 'POST',
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                alert('Error starting project: ' + error);
+            }
+        }
+
+        async function stopProject(projectId) {
+            try {
+                const response = await fetch(`/stop/${projectId}`, {
+                    method: 'POST',
+                });
+                const data = await response.json();
+                alert(data.message);
+            } catch (error) {
+                alert('Error stopping project: ' + error);
+            }
+        }
+    </script>
+</body>
+</html> 
