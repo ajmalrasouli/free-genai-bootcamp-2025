@@ -17,7 +17,7 @@ export function Sidebar() {
     { href: "/study", label: "Study Activities", icon: GraduationCap },
     { href: "/vocabulary", label: "Words", icon: BookOpen },
     { href: "/groups", label: "Word Groups", icon: Layers },
-    { href: "/sessions", label: "Sessions", icon: History },
+    { href: "/history", label: "Study History", icon: History },
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 

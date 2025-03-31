@@ -5,23 +5,23 @@ export interface Word {
   englishTranslation: string;
   pronunciation: string;
   exampleSentence: string;
+  groupId: number;
 }
 
-export interface Group {
+export interface WordGroup {
   id: number;
   name: string;
   description: string;
-  words: number[];
 }
 
-export interface GroupWithCount extends Group {
+export interface GroupWithCount extends WordGroup {
   wordCount: number;
 }
 
 export interface WordReview {
   id: number;
   wordId: number;
-  sessionId: number;
+  studySessionId: number;
   correct: boolean;
   createdAt: string;
 }
@@ -29,9 +29,13 @@ export interface WordReview {
 export interface StudySession {
   id: number;
   groupId: number;
-  date: string;
-  completed: boolean;
-  reviews: WordReview[];
+  groupName: string;
+  startTime: string;
+  endTime?: string;
+  score?: number;
+  correctCount: number;
+  incorrectCount: number;
+  createdAt: string;
 }
 
 export interface WordWithReview extends Word {
@@ -43,27 +47,36 @@ export interface WordWithReview extends Word {
 
 export interface LastStudySession {
   id: number;
-  name: string;
-  correct: number;
-  wrong: number;
-  date: string;
+  groupId: number;
+  groupName: string;
+  startTime: string;
+  endTime?: string;
+  score?: number;
+  correctCount: number;
+  incorrectCount: number;
 }
 
 export interface Progress {
   totalWords: number;
-  studiedWords: number;
+  masteredWords: number;
   masteryProgress: number;
 }
 
 export interface Stats {
-  successRate: number;
-  studySessions: number;
+  totalWords: number;
+  masteredWords: number;
+  totalGroups: number;
   activeGroups: number;
-  studyStreak: string;
+  totalSessions: number;
+  successRate: number;
+  studyStreak: number;
+  averageScore: number;
 }
 
 export interface Dashboard {
-  lastStudySession: LastStudySession;
+  lastStudySession?: LastStudySession;
   progress: Progress;
   stats: Stats;
+  recentSessions: StudySession[];
+  recentWords: Word[];
 } 

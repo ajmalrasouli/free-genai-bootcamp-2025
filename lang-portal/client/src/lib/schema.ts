@@ -3,69 +3,71 @@ export interface Word {
   dariWord: string;
   pronunciation: string;
   englishTranslation: string;
-  exampleSentence?: string;
-  createdAt: string;
-  updatedAt: string;
+  exampleSentence: string;
+  groupId: number;
 }
 
-export interface Group {
+export interface WordGroup {
   id: number;
   name: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
+  description: string;
 }
 
-export interface GroupWithCount extends Group {
+export interface GroupWithCount extends WordGroup {
   wordCount: number;
 }
 
 export interface WordReview {
   id: number;
   wordId: number;
-  userId: number;
+  studySessionId: number;
   correct: boolean;
   createdAt: string;
 }
 
 export interface StudySession {
   id: number;
-  userId: number;
   groupId: number;
+  groupName: string;
   startTime: string;
   endTime?: string;
   score?: number;
+  correctCount: number;
+  incorrectCount: number;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface LastStudySession {
   id: number;
   groupId: number;
+  groupName: string;
   startTime: string;
   endTime?: string;
   score?: number;
+  correctCount: number;
+  incorrectCount: number;
 }
 
 export interface Progress {
-  groupId: number;
   totalWords: number;
   masteredWords: number;
-  lastStudySession?: LastStudySession;
+  masteryProgress: number;
 }
 
 export interface Stats {
   totalWords: number;
+  masteredWords: number;
   totalGroups: number;
+  activeGroups: number;
   totalSessions: number;
-  averageScore: number;
-  progress: Progress[];
+  successRate: number;
+  studyStreak: number;
 }
 
 export interface Dashboard {
+  lastStudySession?: LastStudySession;
+  progress: Progress;
   stats: Stats;
   recentSessions: StudySession[];
   recentWords: Word[];
-}
-
-export type WordGroup = Group; 
+} 

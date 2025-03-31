@@ -1,28 +1,38 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { VocabularyList } from "@/components/VocabularyList";
-import type { GroupWithCount } from "@shared/schema";
+import { fetchJson } from "@/lib/api";
+
+// Define the Word type locally
+interface Word {
+  id: number;
+  dariWord: string;
+  pronunciation: string;
+  englishTranslation: string;
+  exampleSentence: string;
+}
 
 export function VocabularyPage() {
-  const [, params] = useRoute("/vocabulary/:groupId?");
-  const groupId = params?.groupId ? parseInt(params.groupId) : undefined;
-
-  const { data: groups = [], isLoading: isLoadingGroups } = useQuery<GroupWithCount[]>({
-    queryKey: ["/api/groups"],
+  const { data: words = [], isLoading } = useQuery({
+    queryKey: ["/api/words"],
+    queryFn: () => fetchJson<Word[]>("/words"),
+    refetchOnMount: true,
+    staleTime: 0
   });
 
-  if (isLoadingGroups) {
+  console.log("Vocabulary words:", words);
+
+  if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="container mx-auto py-8 space-y-6">
         <Skeleton className="h-8 w-48" />
         <Card>
-          <CardContent className="pt-6 space-y-4">
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -30,28 +40,44 @@ export function VocabularyPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Vocabulary</h1>
-        <Button>Add Word</Button>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {groups.map((group) => (
-          <Card key={group.id}>
-            <CardHeader>
-              <CardTitle>{group.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {group.wordCount} words
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <VocabularyList groupId={groupId} />
+    <div className="container mx-auto py-8 space-y-6">
+      <h1 className="text-3xl font-bold">All Words</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Vocabulary List</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {words.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              No words available. Add words to your vocabulary to see them here.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {words.map((word) => (
+                <div
+                  key={word.id}
+                  className="flex items-center justify-between p-4 rounded-lg border"
+                >
+                  <div className="space-y-1">
+                    <p className="text-xl font-medium" dir="rtl">
+                      {word.dariWord}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {word.pronunciation}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg">{word.englishTranslation}</p>
+                    <p className="text-sm text-muted-foreground" dir="rtl">
+                      {word.exampleSentence}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 } 
