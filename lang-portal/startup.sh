@@ -8,7 +8,7 @@ ls -la
 
 # Install any missing dependencies
 echo "Checking client dependencies..."
-cd darimasterlan/client
+cd client
 npm install --silent || echo "Warning: Some client dependencies could not be installed"
 
 # Ensure tsconfig.json exists
@@ -74,16 +74,25 @@ if [ ! -f "tsconfig.json" ]; then
   echo "Creating server tsconfig.json..."
   echo '{
     "compilerOptions": {
-      "target": "es2016",
-      "module": "commonjs",
+      "target": "ES2020",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
       "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
+      "outDir": "dist",
       "strict": true,
       "skipLibCheck": true,
-      "outDir": "dist"
+      "forceConsistentCasingInFileNames": true,
+      "baseUrl": ".",
+      "paths": {
+        "@shared/*": ["shared/*"]
+      },
+      "types": ["node", "express"]
     },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"]
+    "include": ["*.ts", "shared/**/*.ts"],
+    "ts-node": {
+      "esm": true,
+      "experimentalSpecifierResolution": "node"
+    }
   }' > tsconfig.json
 fi
 
@@ -99,22 +108,15 @@ npm run build || {
 
 # Create public directory for static files
 echo "Setting up public directory..."
-mkdir -p dist/public
+mkdir -p public
 
 # Copy client build to server public directory if it exists
 echo "Copying client build to server public directory..."
-if [ -d "../../client/dist" ]; then
-  cp -r ../../client/dist/* dist/public/ || echo "Warning: Failed to copy client build files"
+if [ -d "../client/dist" ]; then
+  cp -r ../client/dist/* public/ || echo "Warning: Failed to copy client build files"
 else
   echo "Warning: Client build directory not found"
 fi
 
 echo "Starting server..."
-if [ -f "dist/index.js" ]; then
-  # Start the compiled server
-  cd dist && node index.js
-else
-  # Fall back to direct execution with tsx
-  echo "Compiled server not found, using tsx for direct execution..."
-  cd .. && tsx index.ts
-fi 
+npx tsx simple-server.ts 
