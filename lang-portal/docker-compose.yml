@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./server
+    container_name: lang-portal-server
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./client
+    container_name: lang-portal-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+networks:
+  default:
+    name: lang-portal-network 
