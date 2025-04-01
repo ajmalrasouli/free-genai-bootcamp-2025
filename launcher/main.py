@@ -24,49 +24,57 @@ PROJECTS = {
         "name": "Farsi Text Adventure MUD Game",
         "port": 8001,
         "image": "genai-fa-mud",
-        "build_context": "../fa-mud"
+        "build_context": "../fa-mud",
+        "category": "gaming"
     },
     "finger-spelling": {
         "name": "ASL Finger Spelling Application",
         "port": 8002,
         "image": "genai-finger-spelling",
-        "build_context": "../finger-spelling"
+        "build_context": "../finger-spelling",
+        "category": "language"
     },
     "lang-portal": {
         "name": "Language Learning Portal",
         "port": 8003,
         "image": "genai-lang-portal",
-        "build_context": "../lang-portal"
+        "build_context": "../lang-portal",
+        "category": "language"
     },
     "listening-comp": {
         "name": "Persian Learning Assistant",
         "port": 8004,
         "image": "genai-listening-comp",
-        "build_context": "../listening-comp"
+        "build_context": "../listening-comp",
+        "category": "language"
     },
     "opea-comps": {
         "name": "Text-to-Speech Microservice",
         "port": 8005,
         "image": "genai-opea-comps",
-        "build_context": "../opea-comps"
+        "build_context": "../opea-comps",
+        "category": "tools"
     },
     "song-vocab": {
         "name": "Farsi Song Vocabulary Generator",
         "port": 8006,
         "image": "genai-song-vocab",
-        "build_context": "../song-vocab"
+        "build_context": "../song-vocab",
+        "category": "language"
     },
     "visual-novel": {
         "name": "Farsi Learning Visual Novel",
         "port": 8007,
         "image": "genai-visual-novel",
-        "build_context": "../visual-novel"
+        "build_context": "../visual-novel",
+        "category": "gaming"
     },
     "writing-practice": {
         "name": "Farsi Writing Practice App",
         "port": 8008,
         "image": "genai-writing-practice",
-        "build_context": "../writing-practice"
+        "build_context": "../writing-practice",
+        "category": "language"
     }
 }
 
