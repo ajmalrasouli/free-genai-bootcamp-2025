@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM python:3.10-slim
 
 # Create a non-root user
 ARG USERNAME=appuser
@@ -22,19 +22,20 @@ RUN chown -R $USERNAME:$USERNAME /app
 # Switch to non-root user
 USER $USERNAME
 
-# Install Express.js
-RUN npm install express
-
 # Copy project files
 COPY --chown=$USERNAME:$USERNAME . .
 
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Expose the port
-EXPOSE 8007
+EXPOSE 3000
 
 # Set environment variables
-ENV NODE_ENV=production
-ENV PORT=8007
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 ENV HOST=0.0.0.0
+ENV PORT=3000
 
 # Command to run the application
-CMD ["node", "server.js"]
+CMD ["python", "main.py"]

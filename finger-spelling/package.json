@@ -1,0 +1,16 @@
+{
+    "name": "finger-spelling",
+    "version": "1.0.0",
+    "description": "ASL Finger Spelling Application",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js",
+      "dev": "nodemon index.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "socket.io": "^4.7.4",
+      "handpose": "^0.0.1",
+      "tensorflow": "^4.10.0"
+    }
+  }

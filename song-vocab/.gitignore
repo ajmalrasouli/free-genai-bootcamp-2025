@@ -3,3 +3,7 @@ outputs/*/*.text
 .env
 
 *.pyc
+
+# Allow package files
+!package.json
+!package-lock.json

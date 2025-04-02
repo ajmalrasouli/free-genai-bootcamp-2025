@@ -5,7 +5,6 @@ import { DashboardPage } from "./pages/dashboard";
 import { VocabularyPage } from "./pages/VocabularyPage";
 import { GroupsPage } from "./pages/GroupsPage";
 import { StudyPage } from "./pages/StudyPage";
-import { StudySessionPage } from "./pages/StudySessionPage";
 import { StudyHistoryPage } from "./pages/StudyHistoryPage";
 import Settings from "@/pages/settings";
 import NotFound from "@/pages/not-found";

@@ -67,6 +67,8 @@ ERROR_TEMPLATE = """
 # Initialize game components
 game_initialized = False
 engine = None
+initialization_error = None
+
 try:
     logger.info("Attempting to import game modules...")
     from game.vocabulary_loader import VocabularyLoader
@@ -76,16 +78,24 @@ try:
     
     logger.info("Creating game components...")
     vocab_loader = VocabularyLoader()
+    logger.info("VocabularyLoader initialized")
+    
     rooms = create_default_rooms()
+    logger.info(f"Created {len(rooms)} rooms")
+    
+    logger.info("Initializing game engine...")
     engine = GameEngine(vocab_loader, rooms)
-    game_initialized = True
     logger.info("Game engine initialized successfully")
+    
+    game_initialized = True
 except ImportError as e:
     error_tb = traceback.format_exc()
     logger.error(f"Import error: {e}\n{error_tb}")
+    initialization_error = f"Failed to import required modules: {str(e)}"
 except Exception as e:
     error_tb = traceback.format_exc()
     logger.error(f"Error initializing game components: {e}\n{error_tb}")
+    initialization_error = f"Failed to initialize game components: {str(e)}"
 
 # Main HTML template for the game
 HTML_TEMPLATE = """
@@ -210,7 +220,7 @@ HTML_TEMPLATE = """
 def home():
     try:
         if not game_initialized:
-            error_message = "Game engine failed to initialize. Please check the container logs for details."
+            error_message = initialization_error or "Game engine failed to initialize. Please check the container logs for details."
             return render_template_string(
                 ERROR_TEMPLATE, 
                 error_title="Game Initialization Error", 
@@ -231,7 +241,7 @@ def home():
 def process_command():
     try:
         if not game_initialized:
-            return jsonify({"error": "Game engine not initialized"}), 500
+            return jsonify({"error": initialization_error or "Game engine not initialized"}), 500
             
         data = request.get_json()
         if not data:
@@ -251,10 +261,10 @@ def process_command():
 
 @app.route('/health')
 def health_check():
-    """Simple health check endpoint"""
     return jsonify({
-        "status": "ok",
-        "game_initialized": game_initialized
+        'status': 'healthy' if game_initialized else 'unhealthy',
+        'game_initialized': game_initialized,
+        'error': initialization_error
     })
 
 @app.errorhandler(Exception)

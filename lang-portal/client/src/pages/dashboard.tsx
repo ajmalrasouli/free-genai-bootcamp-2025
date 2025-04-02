@@ -52,7 +52,10 @@ export function DashboardPage() {
     queryKey: ["/api/dashboard"],
     queryFn: () => fetchJson<Dashboard>("/dashboard"),
     refetchOnMount: true,
-    staleTime: 0
+    refetchOnWindowFocus: true,
+    refetchInterval: 2000, // Refetch every 2 seconds
+    staleTime: 0, // Consider data stale immediately
+    cacheTime: 0 // Don't cache the data
   });
 
   console.log("Dashboard data:", dashboard);

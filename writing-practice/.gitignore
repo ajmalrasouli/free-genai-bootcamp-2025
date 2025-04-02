@@ -36,3 +36,7 @@ yarn-error.log*
 *.tar.gz
 *.zip
 *.rar
+
+# Allow package files
+!package.json
+!package-lock.json

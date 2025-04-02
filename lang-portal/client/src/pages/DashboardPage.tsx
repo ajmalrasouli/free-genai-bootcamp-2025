@@ -13,7 +13,7 @@ export function DashboardPage() {
     queryFn: () => fetchJson<Dashboard>('/dashboard')
   });
 
-  if (isLoading) {
+  if (isLoading || !dashboard) {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -53,7 +53,7 @@ export function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {dashboard.lastStudySession ? (
+            {dashboard?.lastStudySession ? (
               <>
                 <h3 className="font-semibold mb-2">{dashboard.lastStudySession.groupName}</h3>
                 <p className="text-sm text-muted-foreground">

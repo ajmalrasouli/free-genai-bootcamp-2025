@@ -1,18 +1,38 @@
 FROM python:3.10-slim
 
+# Create a non-root user
+ARG USERNAME=appuser
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        sudo \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Create working directory and set permissions
 WORKDIR /app
+RUN chown -R $USERNAME:$USERNAME /app
+
+# Switch to non-root user
+USER $USERNAME
 
 # Install system dependencies for Hazm
 RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libxslt1-dev \
-    iputils-ping \
+    iproute2 \
     net-tools \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project files first
-COPY . .
+COPY --chown=$USERNAME:$USERNAME . .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt flask gunicorn
@@ -25,20 +45,20 @@ EXPOSE 8001
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 ENV FLASK_APP=web_server.py
-ENV FLASK_DEBUG=1
+ENV FLASK_DEBUG=0
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
 echo "Container started"\n\
 echo "Network interfaces:"\n\
-ip addr\n\
+ip addr show\n\
 echo "Python path:"\n\
 python -c "import sys; print(sys.path)"\n\
 echo "Installed packages:"\n\
 pip list\n\
 echo "Starting web server..."\n\
-python web_server.py\n\
+gunicorn --bind 0.0.0.0:8001 --workers 4 --timeout 120 --log-level debug web_server:app\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
-# Command to run the application with debug logging
-CMD ["/app/start.sh"] 
+# Command to run the application with gunicorn
+CMD ["/app/start.sh"]

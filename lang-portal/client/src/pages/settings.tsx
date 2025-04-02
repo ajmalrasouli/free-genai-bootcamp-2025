@@ -23,12 +23,13 @@ export default function Settings() {
   const handleResetHistory = async () => {
     setIsResetting(true);
     try {
-      await apiRequest("POST", "/api/reset_history");
+      await apiRequest("POST", "/api/reset_study_history");
       toast({
         title: "Success",
         description: "Study history has been reset",
       });
     } catch (error) {
+      console.error('Error in reset:', error);
       toast({
         title: "Error",
         description: "Failed to reset study history",
@@ -48,6 +49,7 @@ export default function Settings() {
         description: "System has been fully reset",
       });
     } catch (error) {
+      console.error('Error in full reset:', error);
       toast({
         title: "Error",
         description: "Failed to perform full reset",

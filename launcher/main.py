@@ -27,11 +27,11 @@ PROJECTS = {
         "build_context": "../fa-mud",
         "category": "gaming"
     },
-    "finger-spelling": {
+    "asl-fingerspelling": {
         "name": "ASL Finger Spelling Application",
         "port": 8002,
-        "image": "genai-finger-spelling",
-        "build_context": "../finger-spelling",
+        "image": "genai-asl-fingerspelling",
+        "build_context": "../asl-fingerspelling",
         "category": "language"
     },
     "lang-portal": {
@@ -82,119 +82,66 @@ class DockerManager:
     def __init__(self):
         self.running_containers = {}
         
-    def build_image(self, project_id):
-        """Build Docker image for a project"""
-        project = PROJECTS[project_id]
-        logger.info(f"Building Docker image for {project_id}")
+    def build_and_run_all(self):
+        """Build and run all containers using docker-compose"""
+        logger.info("Building and running all containers")
         
+        # First stop any existing containers
         result = subprocess.run(
-            ["docker", "build", "-t", project["image"], "."],
-            cwd=project["build_context"],
+            ["docker-compose", "down"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
+        
+        # Then build and run all containers
+        result = subprocess.run(
+            ["docker-compose", "up", "--build", "-d"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
         )
         
         if result.returncode != 0:
-            logger.error(f"Error building image: {result.stderr}")
-            raise Exception(f"Failed to build Docker image: {result.stderr}")
+            logger.error(f"Error running docker-compose: {result.stderr}")
+            raise Exception(f"Failed to run docker-compose: {result.stderr}")
             
-    def cleanup_existing_container(self, container_name):
-        """Remove existing container if it exists"""
-        try:
-            # Check if container exists
-            result = subprocess.run(
-                ["docker", "ps", "-a", "--filter", f"name=^/{container_name}$", "--format", "{{.ID}}"],
-                capture_output=True,
-                text=True
-            )
-            container_id = result.stdout.strip()
-            
-            if container_id:
-                logger.info(f"Found existing container {container_id}, removing it")
-                # Stop container if it's running
-                subprocess.run(["docker", "stop", container_id], capture_output=True)
-                # Remove container
-                subprocess.run(["docker", "rm", container_id], capture_output=True)
-        except Exception as e:
-            logger.error(f"Error cleaning up container: {e}")
-            
-    def start_project(self, project_id):
-        """Start a project's Docker container"""
-        project = PROJECTS[project_id]
+    def stop_all(self):
+        """Stop all containers"""
+        logger.info("Stopping all containers")
         
-        try:
-            # Build the image if it doesn't exist
-            try:
-                subprocess.run(
-                    ["docker", "image", "inspect", project["image"]], 
-                    capture_output=True, 
-                    check=True
-                )
-            except subprocess.CalledProcessError:
-                self.build_image(project_id)
-            
-            # Start the container
-            container_name = f"genai-{project_id}"
-            
-            # Clean up existing container if any
-            self.cleanup_existing_container(container_name)
-            
-            logger.info(f"Starting container {container_name}")
-            
-            result = subprocess.run([
-                "docker", "run",
-                "-d",  # Run in detached mode
-                "--name", container_name,
-                "-p", f"{project['port']}:{project['port']}",  # Port mapping
-                "--rm",  # Remove container when stopped
-                project["image"]
-            ], capture_output=True, text=True)
-            
-            if result.returncode != 0:
-                raise Exception(f"Failed to start container: {result.stderr}")
-            
-            container_id = result.stdout.strip()
-            self.running_containers[project_id] = container_id
-            return container_id
-
-        except Exception as e:
-            logger.error(f"Error starting {project_id}: {str(e)}")
-            raise Exception(f"Failed to start {project_id}: {str(e)}")
-
-    def stop_project(self, project_id):
-        """Stop a project's Docker container"""
-        if project_id in self.running_containers:
-            container_id = self.running_containers[project_id]
-            logger.info(f"Stopping container {container_id}")
-            
-            try:
-                subprocess.run(
-                    ["docker", "stop", container_id],
-                    capture_output=True,
-                    check=True
-                )
-                del self.running_containers[project_id]
-                return True
-            except subprocess.CalledProcessError as e:
-                logger.error(f"Error stopping container: {e.stderr}")
-                raise Exception(f"Failed to stop container: {e.stderr}")
+        result = subprocess.run(
+            ["docker-compose", "down"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
         
-        # If container not in our list, try to find and stop it by name
-        try:
-            container_name = f"genai-{project_id}"
-            self.cleanup_existing_container(container_name)
-            return True
-        except Exception:
-            return False
+        if result.returncode != 0:
+            logger.error(f"Error stopping containers: {result.stderr}")
+            raise Exception(f"Failed to stop containers: {result.stderr}")
 
 docker_manager = DockerManager()
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "projects": PROJECTS}
-    )
+    return templates.TemplateResponse("index.html", {"request": request, "projects": PROJECTS})
+
+@app.post("/start-all")
+async def start_all():
+    try:
+        docker_manager.build_and_run_all()
+        return {"message": "All containers started successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/stop-all")
+async def stop_all():
+    try:
+        docker_manager.stop_all()
+        return {"message": "All containers stopped successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/start/{project_id}")
 async def start_project(project_id: str):
@@ -202,14 +149,28 @@ async def start_project(project_id: str):
         raise HTTPException(status_code=404, detail="Project not found")
     
     try:
-        container_id = docker_manager.start_project(project_id)
-        return {
-            "status": "success", 
-            "message": f"Project {project_id} started", 
-            "container_id": container_id
-        }
+        # First stop any existing container for this project
+        result = subprocess.run(
+            ["docker-compose", "stop", project_id],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
+        
+        # Then build and run the specific project
+        result = subprocess.run(
+            ["docker-compose", "up", "--build", "-d", project_id],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            raise Exception(f"Failed to start {project_id}: {result.stderr}")
+            
+        return {"status": "success", "message": f"Project {project_id} started"}
     except Exception as e:
-        logger.error(f"Error in start_project endpoint: {str(e)}")
+        logger.error(f"Error starting {project_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/stop/{project_id}")
@@ -218,23 +179,27 @@ async def stop_project(project_id: str):
         raise HTTPException(status_code=404, detail="Project not found")
     
     try:
-        if docker_manager.stop_project(project_id):
-            return {"status": "success", "message": f"Project {project_id} stopped"}
-        else:
-            return {"status": "warning", "message": f"Project {project_id} was not running"}
+        # Stop the specific project using docker-compose
+        result = subprocess.run(
+            ["docker-compose", "stop", project_id],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
+        
+        if result.returncode != 0:
+            raise Exception(f"Failed to stop {project_id}: {result.stderr}")
+            
+        return {"status": "success", "message": f"Project {project_id} stopped"}
     except Exception as e:
-        logger.error(f"Error in stop_project endpoint: {str(e)}")
+        logger.error(f"Error stopping {project_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
     try:
         print("Starting server on http://127.0.0.1:3000")
-        uvicorn.run(app, host="127.0.0.1", port=3000)
+        uvicorn.run(app, host="0.0.0.0", port=3000)
     except Exception as e:
-        print(f"Error starting server: {e}")
-        try:
-            print("Attempting to start on alternative port http://127.0.0.1:3001...")
-            uvicorn.run(app, host="127.0.0.1", port=3001)
-        except Exception as e:
-            print(f"Error starting server on alternative port: {e}") 
+        logger.error(f"Server error: {str(e)}")
+        raise

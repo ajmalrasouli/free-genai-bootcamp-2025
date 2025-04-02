@@ -73,3 +73,7 @@ dist/
 *.7z
 *.rar
 *.bz2
+
+# Allow package files
+!package.json
+!package-lock.json

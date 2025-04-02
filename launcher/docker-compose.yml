@@ -1,0 +1,87 @@
+services:
+  launcher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: launcher
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
+  fa-mud:
+    build:
+      context: ../fa-mud
+      dockerfile: Dockerfile
+    container_name: fa-mud
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+
+  asl-fingerspelling:
+    build:
+      context: ../asl-fingerspelling
+      dockerfile: Dockerfile
+    container_name: asl-fingerspelling
+    ports:
+      - "8002:8002"
+    restart: unless-stopped
+
+  lang-portal:
+    build:
+      context: ../lang-portal
+      dockerfile: Dockerfile
+    container_name: lang-portal
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+
+  listening-comp:
+    build:
+      context: ../listening-comp
+      dockerfile: Dockerfile
+    container_name: listening-comp
+    ports:
+      - "8004:8004"
+    restart: unless-stopped
+
+  opea-comps:
+    build:
+      context: ../opea-comps
+      dockerfile: Dockerfile
+    container_name: opea-comps
+    ports:
+      - "8005:8005"
+    restart: unless-stopped
+
+  song-vocab:
+    build:
+      context: ../song-vocab
+      dockerfile: Dockerfile
+    container_name: song-vocab
+    ports:
+      - "8006:8006"
+    restart: unless-stopped
+
+  visual-novel:
+    build:
+      context: ../visual-novel
+      dockerfile: Dockerfile
+    container_name: visual-novel
+    ports:
+      - "8007:8007"
+    restart: unless-stopped
+
+  writing-practice:
+    build:
+      context: ../writing-practice
+      dockerfile: Dockerfile
+    container_name: writing-practice
+    ports:
+      - "8008:8008"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: launcher-network

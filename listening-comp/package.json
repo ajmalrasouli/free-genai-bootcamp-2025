@@ -1,0 +1,18 @@
+{
+    "name": "listening-comp",
+    "version": "1.0.0",
+    "description": "Listening Comprehension System",
+    "main": "backend/main.py",
+    "scripts": {
+      "start": "python backend/main.py",
+      "dev": "python -m debugpy --listen 0.0.0.0:5678 --wait-for-client backend/main.py"
+    },
+    "dependencies": {
+      "python-dotenv": "^1.0.0",
+      "fastapi": "^0.109.2",
+      "uvicorn": "^0.27.1",
+      "python-multipart": "^0.0.6",
+      "librosa": "^0.10.1",
+      "soundfile": "^0.12.1"
+    }
+  }

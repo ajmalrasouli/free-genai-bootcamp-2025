@@ -1,40 +1,54 @@
 FROM node:18-slim
 
+# Create a non-root user
+ARG USERNAME=appuser
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        sudo \
+    && rm -rf /var/lib/apt/lists/* \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Create working directory and set permissions
 WORKDIR /app
+RUN chown -R $USERNAME:$USERNAME /app
 
-# Install necessary packages
-RUN apt-get update && apt-get install -y \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Switch to non-root user
+USER $USERNAME
 
-# Copy package.json files
-COPY server/package*.json ./server/
-COPY client/package*.json ./client/
+# Install bash and other dependencies
+RUN apk add --no-cache bash
+
+# Copy package files
+COPY --chown=$USERNAME:$USERNAME package*.json ./
 
 # Install dependencies
-RUN cd server && npm install
-RUN cd client && npm install
+RUN npm install
 
-# Copy source files
-COPY server ./server/
-COPY client ./client/
+# Copy the entire application
+COPY --chown=$USERNAME:$USERNAME . .
 
-# Build TypeScript files
-RUN cd server && npm run build
-RUN cd client && npm run build
+# Make the startup script executable
+RUN chmod +x startup.sh
 
-# Make sure the public directory exists in server directory
-RUN mkdir -p server/public
+# Install dependencies for client and server
+RUN cd client && npm install --quiet
+RUN cd server && npm install --quiet
 
-# Copy client build to server public directory
-RUN cp -r client/dist/* server/public/
+# Create database directory
+RUN mkdir -p server
+
+# Seed the database
+RUN cd server && npm install && node seed.js
 
 # Expose the port
 EXPOSE 8003
 
-# Set environment variables
-ENV NODE_ENV=production
-ENV PORT=8003
-
-# Start the server using tsx for TypeScript support
-CMD ["npx", "tsx", "server/simple-server.ts"] 
+# Run the startup script
+CMD ["./startup.sh"]
