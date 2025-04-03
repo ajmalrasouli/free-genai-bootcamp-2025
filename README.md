@@ -217,14 +217,14 @@ A simple and interactive application to help users practice writing in Farsi (Pe
 ![ASL Finger Spelling](finger-spelling/reference_images/image4.png)*The ASL application uses computer vision to recognize hand gestures and translate them into letters, with a practice mode for learning.*
 
 ### 3. Language Learning Portal (lang-portal)
-![Language Portal](lang-portal/darimasterlan/reference_images/dashboard.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image1.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image2.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image3.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image4.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image5.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image6.png)
-![Language Portal](lang-portal/darimasterlan/reference_images/image7.png)
+![Language Portal](lang-portal/reference_images/dashboard.png)
+![Language Portal](lang-portal/reference_images/image1.png)
+![Language Portal](lang-portal/reference_images/image2.png)
+![Language Portal](lang-portal/reference_images/image3.png)
+![Language Portal](lang-portal/reference_images/image4.png)
+![Language Portal](lang-portal/reference_images/image5.png)
+![Language Portal](lang-portal/reference_images/image6.png)
+![Language Portal](lang-portal/reference_images/image7.png)
 *The language portal provides a comprehensive dashboard for tracking progress and accessing various learning activities.*
 
 ### 4. Persian Learning Assistant (listening-comp)
