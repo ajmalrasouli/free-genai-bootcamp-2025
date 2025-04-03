@@ -23,58 +23,66 @@ PROJECTS = {
     "fa-mud": {
         "name": "Farsi Text Adventure MUD Game",
         "port": 8001,
-        "image": "genai-fa-mud",
+        "image": "dari-fa-mud",
         "build_context": "../fa-mud",
-        "category": "gaming"
+        "category": "gaming",
+        "url": "http://dari-fa-mud:8001"
     },
-    "asl-fingerspelling": {
-        "name": "ASL Finger Spelling Application",
+    "finger-spelling": {
+        "name": "Finger Spelling Application",
         "port": 8002,
-        "image": "genai-asl-fingerspelling",
-        "build_context": "../asl-fingerspelling",
-        "category": "language"
+        "image": "dari-finger-spelling",
+        "build_context": "../finger-spelling",
+        "category": "language",
+        "url": "http://dari-finger-spelling:8002"
     },
     "lang-portal": {
         "name": "Language Learning Portal",
         "port": 8003,
-        "image": "genai-lang-portal",
+        "image": "dari-lang-portal",
         "build_context": "../lang-portal",
-        "category": "language"
+        "category": "language",
+        "url": "http://dari-lang-portal:8003"
     },
     "listening-comp": {
         "name": "Persian Learning Assistant",
         "port": 8004,
-        "image": "genai-listening-comp",
+        "image": "dari-listening-comp",
         "build_context": "../listening-comp",
-        "category": "language"
+        "category": "language",
+        "url": "http://dari-listening-comp:8004"
     },
     "opea-comps": {
         "name": "Text-to-Speech Microservice",
         "port": 8005,
-        "image": "genai-opea-comps",
+        "image": "dari-opea-comps",
         "build_context": "../opea-comps",
-        "category": "tools"
+        "category": "tools",
+        "url": "http://dari-opea-comps:8005"
     },
     "song-vocab": {
         "name": "Farsi Song Vocabulary Generator",
         "port": 8006,
-        "image": "genai-song-vocab",
+        "image": "dari-song-vocab",
         "build_context": "../song-vocab",
-        "category": "language"
+        "category": "language",
+        "url": "http://dari-song-vocab:8006"
     },
     "visual-novel": {
         "name": "Farsi Learning Visual Novel",
         "port": 8007,
-        "image": "genai-visual-novel",
+        "image": "dari-visual-novel",
         "build_context": "../visual-novel",
-        "category": "gaming"
+        "category": "gaming",
+        "url": "http://dari-visual-novel:8007"
     },
     "writing-practice": {
         "name": "Farsi Writing Practice App",
         "port": 8008,
-        "image": "genai-writing-practice",
+        "image": "dari-writing-practice",
         "build_context": "../writing-practice",
-        "category": "language"
+        "category": "language",
+        "url": "http://dari-writing-practice:8008"
     }
 }
 

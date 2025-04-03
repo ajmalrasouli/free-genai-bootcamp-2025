@@ -1,9 +1,18 @@
 FROM python:3.10-slim
 
-# Create a non-root user
+# Install system dependencies as root
+RUN apt-get update && apt-get install -y \
+    libxml2-dev \
+    libxslt1-dev \
+    iproute2 \
+    net-tools \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user with a unique GID
 ARG USERNAME=appuser
 ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_GID=1003  # Changed from 1000 to 1003
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
@@ -21,15 +30,6 @@ RUN chown -R $USERNAME:$USERNAME /app
 
 # Switch to non-root user
 USER $USERNAME
-
-# Install system dependencies for Hazm
-RUN apt-get update && apt-get install -y \
-    libxml2-dev \
-    libxslt1-dev \
-    iproute2 \
-    net-tools \
-    procps \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy project files first
 COPY --chown=$USERNAME:$USERNAME . .

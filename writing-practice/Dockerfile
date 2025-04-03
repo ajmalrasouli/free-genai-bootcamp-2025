@@ -1,9 +1,15 @@
 FROM python:3.10-slim
 
-# Create a non-root user
+# Install system dependencies as root
+RUN apt-get update && apt-get install -y \
+    libxml2-dev \
+    libxslt1-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user with a unique GID
 ARG USERNAME=appuser
 ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_GID=1002
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
@@ -21,12 +27,6 @@ RUN chown -R $USERNAME:$USERNAME /app
 
 # Switch to non-root user
 USER $USERNAME
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libxml2-dev \
-    libxslt1-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy project files
 COPY --chown=$USERNAME:$USERNAME . .

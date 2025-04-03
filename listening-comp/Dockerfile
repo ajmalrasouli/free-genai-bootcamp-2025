@@ -1,9 +1,14 @@
 FROM python:3.10-slim
 
-# Create a non-root user
+# Install system dependencies as root
+RUN apt-get update && apt-get install -y \
+    libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user with unique UID and GID
 ARG USERNAME=appuser
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_UID=1005  # Changed from 1000 to 1005
+ARG USER_GID=1005  # Changed from 1000 to 1005
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
@@ -11,7 +16,6 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         sudo \
-        libsndfile1 \
     && rm -rf /var/lib/apt/lists/* \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME

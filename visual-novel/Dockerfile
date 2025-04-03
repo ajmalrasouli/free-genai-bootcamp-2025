@@ -1,9 +1,18 @@
 FROM node:18-slim
 
-# Create a non-root user
+# Install system dependencies as root
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user with unique UID and GID
 ARG USERNAME=appuser
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_UID=1004  # Changed from 1000 to 1004
+ARG USER_GID=1004  # Changed from 1000 to 1004
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \

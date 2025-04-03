@@ -1,9 +1,18 @@
 FROM node:18-slim
 
-# Create a non-root user
+# Install system dependencies as root
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user with unique UID and GID
 ARG USERNAME=appuser
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+ARG USER_UID=1001  # Changed from 1000 to 1001
+ARG USER_GID=1001  # Changed from 1000 to 1001
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
@@ -22,33 +31,19 @@ RUN chown -R $USERNAME:$USERNAME /app
 # Switch to non-root user
 USER $USERNAME
 
-# Install bash and other dependencies
-RUN apk add --no-cache bash
-
-# Copy package files
-COPY --chown=$USERNAME:$USERNAME package*.json ./
+# Copy project files
+COPY --chown=$USERNAME:$USERNAME . .
 
 # Install dependencies
 RUN npm install
 
-# Copy the entire application
-COPY --chown=$USERNAME:$USERNAME . .
-
-# Make the startup script executable
-RUN chmod +x startup.sh
-
-# Install dependencies for client and server
-RUN cd client && npm install --quiet
-RUN cd server && npm install --quiet
-
-# Create database directory
-RUN mkdir -p server
-
-# Seed the database
-RUN cd server && npm install && node seed.js
-
 # Expose the port
 EXPOSE 8003
 
-# Run the startup script
-CMD ["./startup.sh"]
+# Set environment variables
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=8003
+
+# Command to run the application
+CMD ["npm", "start"]

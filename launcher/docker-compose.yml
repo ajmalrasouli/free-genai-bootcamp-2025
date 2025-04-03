@@ -1,87 +1,107 @@
+version: '3.8'
+
 services:
   launcher:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: launcher
+    container_name: dari-launcher
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+    networks:
+      - dari-network
     restart: unless-stopped
 
   fa-mud:
     build:
       context: ../fa-mud
       dockerfile: Dockerfile
-    container_name: fa-mud
+    container_name: dari-fa-mud
     ports:
       - "8001:8001"
+    networks:
+      - dari-network
     restart: unless-stopped
 
-  asl-fingerspelling:
+  finger-spelling:
     build:
-      context: ../asl-fingerspelling
+      context: ../finger-spelling
       dockerfile: Dockerfile
-    container_name: asl-fingerspelling
+    container_name: dari-finger-spelling
     ports:
       - "8002:8002"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   lang-portal:
     build:
       context: ../lang-portal
       dockerfile: Dockerfile
-    container_name: lang-portal
+    container_name: dari-lang-portal
     ports:
       - "8003:8003"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   listening-comp:
     build:
       context: ../listening-comp
       dockerfile: Dockerfile
-    container_name: listening-comp
+    container_name: dari-listening-comp
     ports:
       - "8004:8004"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   opea-comps:
     build:
       context: ../opea-comps
       dockerfile: Dockerfile
-    container_name: opea-comps
+    container_name: dari-opea-comps
     ports:
       - "8005:8005"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   song-vocab:
     build:
       context: ../song-vocab
       dockerfile: Dockerfile
-    container_name: song-vocab
+    container_name: dari-song-vocab
     ports:
       - "8006:8006"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   visual-novel:
     build:
       context: ../visual-novel
       dockerfile: Dockerfile
-    container_name: visual-novel
+    container_name: dari-visual-novel
     ports:
       - "8007:8007"
+    networks:
+      - dari-network
     restart: unless-stopped
 
   writing-practice:
     build:
       context: ../writing-practice
       dockerfile: Dockerfile
-    container_name: writing-practice
+    container_name: dari-writing-practice
     ports:
       - "8008:8008"
+    networks:
+      - dari-network
     restart: unless-stopped
 
 networks:
-  default:
-    name: launcher-network
+  dari-network:
+    name: dari-network
