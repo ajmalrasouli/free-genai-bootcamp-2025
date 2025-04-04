@@ -112,7 +112,7 @@ class DockerManager:
         
         # Then build and run all containers
         result = subprocess.run(
-            ["docker-compose", "up", "--build", "-d"],
+            ["docker-compose", "up", "-d"],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -201,7 +201,7 @@ async def start_project(project_id: str):
         
         # Then build and run the specific project
         result = subprocess.run(
-            ["docker-compose", "up", "--build", "-d", project_id],
+            ["docker-compose", "up", "-d", project_id],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True

@@ -1,8 +1,16 @@
 FROM python:3.10-slim
 
+# Create a non-root user
+ARG USERNAME=appuser
+ARG USER_UID=1000
+ARG USER_GID=1000
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
 WORKDIR /app
 
 # Install system dependencies
+# Keep these running as root before switching user
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
@@ -14,11 +22,16 @@ RUN apt-get update && apt-get install -y \
     net-tools \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project files
-COPY . .
-
-# Install dependencies
+# Copy requirements first and install as root, in case they need root access
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code and change ownership
+COPY . .
+RUN chown -R $USERNAME:$USERNAME /app
+
+# Switch to non-root user
+USER $USERNAME
 
 # Expose the port the app runs on
 EXPOSE 8002

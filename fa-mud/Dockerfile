@@ -31,12 +31,16 @@ RUN chown -R $USERNAME:$USERNAME /app
 # Switch to non-root user
 USER $USERNAME
 
-# Copy project files first
-COPY --chown=$USERNAME:$USERNAME . .
+# Copy dependency definition files first
+COPY --chown=$USERNAME:$USERNAME requirements.txt setup.py ./
 
 # Install dependencies
+# Combine flask and gunicorn with requirements install
 RUN pip install --no-cache-dir -r requirements.txt flask gunicorn
-RUN pip install -e .
+RUN pip install --no-cache-dir .  # Install the project itself (non-editable)
+
+# Copy the rest of the project files
+COPY --chown=$USERNAME:$USERNAME . .
 
 # Expose the port the app runs on
 EXPOSE 8001
@@ -57,7 +61,7 @@ python -c "import sys; print(sys.path)"\n\
 echo "Installed packages:"\n\
 pip list\n\
 echo "Starting web server..."\n\
-python -m gunicorn --bind 0.0.0.0:8001 --workers 4 --timeout 120 --log-level debug web_server:app\n\
+python -m gunicorn --bind 0.0.0.0:8001 --workers 4 --timeout 120 --log-level debug --preload web_server:app\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # Command to run the application with gunicorn
