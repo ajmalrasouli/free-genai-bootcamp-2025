@@ -194,8 +194,17 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <!-- 1. Text Adventure MUD -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-orange-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-orange-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-dungeon illustration-icon text-orange-500"></i>
+                        {% if container_status.get('fa-mud', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">1️⃣ Farsi Text Adventure MUD</h2>
@@ -207,8 +216,17 @@
 
                 <!-- 2. ASL Finger Spelling -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-green-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-green-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-american-sign-language-interpreting illustration-icon text-green-500"></i>
+                        {% if container_status.get('finger-spelling', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">2️⃣ ASL Finger Spelling</h2>
@@ -220,21 +238,39 @@
 
                 <!-- 3. Language Portal -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-language illustration-icon text-indigo-500"></i>
+                        {% if container_status.get('lang-portal', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">3️⃣ Language Learning Portal</h2>
-                        <a href="http://localhost:5173" target="_blank" class="launch-btn w-full py-2 px-4 rounded-lg text-white font-medium">
+                        <button onclick="startProject('lang-portal')" class="launch-btn w-full py-2 px-4 rounded-lg text-white font-medium">
                             Launch
-                        </a>
+                        </button>
                     </div>
                 </div>
 
                 <!-- 4. Persian Learning Assistant -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-blue-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-blue-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-headphones-alt illustration-icon text-blue-500"></i>
+                        {% if container_status.get('listening-comp', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">4️⃣ Persian Learning Assistant</h3>
@@ -247,8 +283,17 @@
 
                 <!-- 5. Text-to-Speech Microservice -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-microphone illustration-icon text-indigo-500"></i>
+                        {% if container_status.get('opea-comps', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">5️⃣ Text-to-Speech Microservice</h3>
@@ -261,8 +306,17 @@
 
                 <!-- 6. Farsi Song Vocabulary Generator -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-purple-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-purple-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-music illustration-icon text-purple-500"></i>
+                        {% if container_status.get('song-vocab', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">6️⃣ Farsi Song Vocabulary Generator</h3>
@@ -275,8 +329,17 @@
 
                 <!-- 7. Farsi Learning Visual Novel -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-pink-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-pink-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-book-reader illustration-icon text-pink-500"></i>
+                        {% if container_status.get('visual-novel', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">7️⃣ Farsi Learning Visual Novel</h3>
@@ -289,8 +352,17 @@
 
                 <!-- 8. Farsi Writing Practice App -->
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-green-100 p-6 flex justify-center items-center h-48">
+                    <div class="bg-green-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas fa-pencil-alt illustration-icon text-green-500"></i>
+                        {% if container_status.get('writing-practice', False) %}
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-check-circle mr-1"></i>Running
+                        </div>
+                        {% else %}
+                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
+                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">8️⃣ Farsi Writing Practice App</h3>
@@ -351,18 +423,74 @@
 
         async function startProject(projectId) {
             try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Starting...';
+                button.disabled = true;
+                
                 const response = await fetch(`/start/${projectId}`, {
                     method: 'POST',
                 });
                 const data = await response.json();
                 
                 if (data.status === 'success') {
-                    window.open(`http://localhost:${getProjectPort(projectId)}`, '_blank');
+                    // Wait a moment for the container to fully initialize
+                    setTimeout(() => {
+                        button.textContent = 'Launching...';
+                        // Check if container is ready before opening
+                        checkContainerStatus(projectId, () => {
+                            window.open(`http://localhost:${getProjectPort(projectId)}`, '_blank');
+                            button.textContent = originalText;
+                            button.disabled = false;
+                        });
+                    }, 2000);
                 } else {
-                alert(data.message);
+                    alert(data.message);
+                    button.textContent = originalText;
+                    button.disabled = false;
                 }
             } catch (error) {
+                console.error('Error:', error);
                 alert('Error starting project: ' + error);
+                event.target.textContent = 'Launch';
+                event.target.disabled = false;
+            }
+        }
+
+        async function checkContainerStatus(projectId, callback) {
+            try {
+                // Simple health check - in a real app, you might want to implement
+                // a proper health check endpoint for each service
+                const maxAttempts = 10;
+                let attempts = 0;
+                
+                const checkStatus = async () => {
+                    attempts++;
+                    try {
+                        // Try to fetch the project URL to see if it's responding
+                        const response = await fetch(`http://localhost:${getProjectPort(projectId)}`, {
+                            mode: 'no-cors', // This allows us to check if the server is up without CORS issues
+                            method: 'HEAD'
+                        });
+                        
+                        // If we get here, the server is responding
+                        callback();
+                    } catch (error) {
+                        if (attempts < maxAttempts) {
+                            // Try again after a delay
+                            setTimeout(checkStatus, 1000);
+                        } else {
+                            alert(`Project ${projectId} is not responding. It may still be starting up or there might be an issue.`);
+                            callback(); // Still open the URL even if we can't confirm it's ready
+                        }
+                    }
+                };
+                
+                checkStatus();
+            } catch (error) {
+                console.error('Error checking container status:', error);
+                callback(); // Proceed anyway
             }
         }
 

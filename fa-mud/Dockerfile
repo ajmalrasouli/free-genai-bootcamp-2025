@@ -57,7 +57,7 @@ python -c "import sys; print(sys.path)"\n\
 echo "Installed packages:"\n\
 pip list\n\
 echo "Starting web server..."\n\
-gunicorn --bind 0.0.0.0:8001 --workers 4 --timeout 120 --log-level debug web_server:app\n\
+python -m gunicorn --bind 0.0.0.0:8001 --workers 4 --timeout 120 --log-level debug web_server:app\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # Command to run the application with gunicorn

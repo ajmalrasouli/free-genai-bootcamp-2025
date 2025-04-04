@@ -26,7 +26,8 @@ PROJECTS = {
         "image": "dari-fa-mud",
         "build_context": "../fa-mud",
         "category": "gaming",
-        "url": "http://dari-fa-mud:8001"
+        "internal_url": "http://dari-fa-mud:8001",
+        "external_url": "http://localhost:8001"
     },
     "finger-spelling": {
         "name": "Finger Spelling Application",
@@ -34,7 +35,8 @@ PROJECTS = {
         "image": "dari-finger-spelling",
         "build_context": "../finger-spelling",
         "category": "language",
-        "url": "http://dari-finger-spelling:8002"
+        "internal_url": "http://dari-finger-spelling:8002",
+        "external_url": "http://localhost:8002"
     },
     "lang-portal": {
         "name": "Language Learning Portal",
@@ -42,7 +44,8 @@ PROJECTS = {
         "image": "dari-lang-portal",
         "build_context": "../lang-portal",
         "category": "language",
-        "url": "http://dari-lang-portal:8003"
+        "internal_url": "http://dari-lang-portal:8003",
+        "external_url": "http://localhost:8003"
     },
     "listening-comp": {
         "name": "Persian Learning Assistant",
@@ -50,7 +53,8 @@ PROJECTS = {
         "image": "dari-listening-comp",
         "build_context": "../listening-comp",
         "category": "language",
-        "url": "http://dari-listening-comp:8004"
+        "internal_url": "http://dari-listening-comp:8004",
+        "external_url": "http://localhost:8004"
     },
     "opea-comps": {
         "name": "Text-to-Speech Microservice",
@@ -58,7 +62,8 @@ PROJECTS = {
         "image": "dari-opea-comps",
         "build_context": "../opea-comps",
         "category": "tools",
-        "url": "http://dari-opea-comps:8005"
+        "internal_url": "http://dari-opea-comps:8005",
+        "external_url": "http://localhost:8005"
     },
     "song-vocab": {
         "name": "Farsi Song Vocabulary Generator",
@@ -66,7 +71,8 @@ PROJECTS = {
         "image": "dari-song-vocab",
         "build_context": "../song-vocab",
         "category": "language",
-        "url": "http://dari-song-vocab:8006"
+        "internal_url": "http://dari-song-vocab:8006",
+        "external_url": "http://localhost:8006"
     },
     "visual-novel": {
         "name": "Farsi Learning Visual Novel",
@@ -74,7 +80,8 @@ PROJECTS = {
         "image": "dari-visual-novel",
         "build_context": "../visual-novel",
         "category": "gaming",
-        "url": "http://dari-visual-novel:8007"
+        "internal_url": "http://dari-visual-novel:8007",
+        "external_url": "http://localhost:8007"
     },
     "writing-practice": {
         "name": "Farsi Writing Practice App",
@@ -82,7 +89,8 @@ PROJECTS = {
         "image": "dari-writing-practice",
         "build_context": "../writing-practice",
         "category": "language",
-        "url": "http://dari-writing-practice:8008"
+        "internal_url": "http://dari-writing-practice:8008",
+        "external_url": "http://localhost:8008"
     }
 }
 
@@ -133,7 +141,33 @@ docker_manager = DockerManager()
 
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "projects": PROJECTS})
+    # Check container status and add it to the projects data
+    container_status = {}
+    try:
+        result = subprocess.run(
+            ["docker-compose", "ps", "--services", "--filter", "status=running"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            capture_output=True,
+            text=True
+        )
+        running_services = result.stdout.strip().split('\n')
+        running_services = [s for s in running_services if s]  # Remove empty strings
+        
+        for project_id in PROJECTS:
+            container_status[project_id] = project_id in running_services
+    except Exception as e:
+        logger.error(f"Error checking container status: {str(e)}")
+        # Default to all containers not running if we can't check
+        container_status = {project_id: False for project_id in PROJECTS}
+    
+    return templates.TemplateResponse(
+        "index.html", 
+        {
+            "request": request, 
+            "projects": PROJECTS,
+            "container_status": container_status
+        }
+    )
 
 @app.post("/start-all")
 async def start_all():
