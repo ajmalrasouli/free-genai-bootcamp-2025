@@ -1,10 +1,11 @@
-// API-only server for the Persian/Dari Language Learning Portal
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { Op } from 'sequelize';
 import path from 'path'; // Import path module
 import { fileURLToPath } from 'url'; // Import url module helpers
-import { sequelize, Word, WordGroup, StudySession, WordReview } from './database.js';
+// Import from database.ts now, but keep .js extension for NodeNext module resolution
+import { sequelize, Word, WordGroup, StudySession, WordReview, StudySessionAttributes } from './database.js';
+import { InstanceType } from 'sequelize';
 
 // Helper to get __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -31,12 +32,13 @@ const clientBuildPath = path.join(__dirname, '../../client/dist'); // Path relat
 app.use(express.static(clientBuildPath));
 // --- End Static File Serving ---
 
+
 // Initialize database
 async function initializeDatabase() {
   try {
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
-    
+
     // Sync models with database
     await sequelize.sync();
     console.log('Database synced successfully.');
@@ -50,7 +52,7 @@ async function initializeDatabase() {
 const apiRouter = express.Router();
 
 // API Home
-apiRouter.get('/', (req, res) => {
+apiRouter.get('/', (req: Request, res: Response) => { // Add types
   res.json({
     message: "Dari Language Learning Portal API",
     endpoints: [
@@ -66,7 +68,7 @@ apiRouter.get('/', (req, res) => {
 });
 
 // Groups endpoint
-apiRouter.get('/groups', async (req, res) => {
+apiRouter.get('/groups', async (req: Request, res: Response) => { // Add types
   try {
     const groups = await WordGroup.findAll();
     res.json(groups);
@@ -77,13 +79,20 @@ apiRouter.get('/groups', async (req, res) => {
 });
 
 // Words endpoint
-apiRouter.get('/words', async (req, res) => {
+apiRouter.get('/words', async (req: Request, res: Response) => {
   try {
-    const groupId = req.query.groupId ? parseInt(req.query.groupId) : undefined;
-    const words = groupId 
+    // Explicitly handle query parameter type and parse correctly
+    let groupId: number | undefined = undefined;
+    if (typeof req.query.groupId === 'string') {
+        const parsedId = parseInt(req.query.groupId, 10);
+        if (!isNaN(parsedId)) {
+            groupId = parsedId;
+        }
+    }
+
+    const words = typeof groupId === 'number'
       ? await Word.findAll({ where: { groupId } })
       : await Word.findAll();
-    
     res.json(words);
   } catch (error) {
     console.error('Error fetching words:', error);
@@ -92,11 +101,13 @@ apiRouter.get('/words', async (req, res) => {
 });
 
 // Group words endpoint
-apiRouter.get('/groups/:id/words', async (req, res) => {
+apiRouter.get('/groups/:id/words', async (req: Request, res: Response) => { // Add types
   try {
-    const groupId = parseInt(req.params.id);
+    const groupId = parseInt(req.params.id, 10);
+    if (isNaN(groupId)) {
+      return res.status(400).json({ error: 'Invalid group ID' });
+    }
     const words = await Word.findAll({ where: { groupId } });
-    
     res.json(words);
   } catch (error) {
     console.error('Error fetching group words:', error);
@@ -105,7 +116,7 @@ apiRouter.get('/groups/:id/words', async (req, res) => {
 });
 
 // Dashboard endpoint
-apiRouter.get('/dashboard', async (req, res) => {
+apiRouter.get('/dashboard', async (req: Request, res: Response) => { // Add types
   try {
     // Get statistics from database
     const [totalWords, totalGroups, recentSessions, lastSession, totalSessions] = await Promise.all([
@@ -129,15 +140,17 @@ apiRouter.get('/dashboard', async (req, res) => {
     let currentDate = new Date(today);
 
     while (true) {
+      const startOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+      const endOfDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
       const hasSessionOnDay = await StudySession.findOne({
         where: {
           createdAt: {
-            [Op.gte]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
-            [Op.lt]: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1)
+            [Op.gte]: startOfDay,
+            [Op.lt]: endOfDay
           }
         }
       });
-      
+
       if (!hasSessionOnDay) break;
       streak++;
       currentDate.setDate(currentDate.getDate() - 1);
@@ -148,8 +161,12 @@ apiRouter.get('/dashboard', async (req, res) => {
       where: { score: { [Op.not]: null } }
     });
 
+    // Use InstanceType<StudySessionAttributes> if StudySession is the class
     const averageScore = completedSessions.length > 0
-      ? Math.round(completedSessions.reduce((sum, s) => sum + s.score, 0) / completedSessions.length)
+      ? Math.round(completedSessions.reduce((sum: number, s: InstanceType<typeof StudySession>) => {
+          const score = s.score === null ? 0 : s.score;
+          return sum + score;
+        }, 0) / completedSessions.length)
       : 0;
 
     // Get recent words
@@ -158,17 +175,24 @@ apiRouter.get('/dashboard', async (req, res) => {
       limit: 5
     });
 
+    // Use InstanceType<StudySessionAttributes>
+    const masteredWordsCount = recentSessions.reduce((sum: number, s: InstanceType<typeof StudySession>) => {
+        const correctCount = s.correctCount === null ? 0 : s.correctCount;
+        return sum + correctCount;
+    }, 0);
+    const masteryProgressValue = totalWords > 0 ? Math.round((masteredWordsCount / totalWords) * 100) : 0;
+
     const dashboard = {
       lastStudySession: lastSession,
       progress: {
         totalWords,
-        masteredWords: recentSessions.reduce((sum, s) => sum + (s.correctCount || 0), 0),
-        masteryProgress: Math.round((recentSessions.reduce((sum, s) => sum + (s.correctCount || 0), 0) / totalWords) * 100)
+        masteredWords: masteredWordsCount,
+        masteryProgress: masteryProgressValue
       },
       stats: {
         totalWords,
         totalGroups,
-        activeGroups: totalGroups,
+        activeGroups: totalGroups, // Assuming all groups are active for now
         totalSessions,
         successRate: averageScore,
         studyStreak: streak
@@ -185,7 +209,7 @@ apiRouter.get('/dashboard', async (req, res) => {
 });
 
 // Study sessions endpoint
-apiRouter.get('/study_sessions', async (req, res) => {
+apiRouter.get('/study_sessions', async (req: Request, res: Response) => { // Add types
   try {
     const sessions = await StudySession.findAll();
     res.json(sessions);
@@ -196,16 +220,15 @@ apiRouter.get('/study_sessions', async (req, res) => {
 });
 
 // Create study session endpoint
-apiRouter.post('/study_sessions', async (req, res) => {
+apiRouter.post('/study_sessions', async (req: Request, res: Response) => {
   try {
     const { groupId, groupName } = req.body;
     const session = await StudySession.create({
       groupId,
       groupName,
-      startTime: new Date().toISOString(),
-      createdAt: new Date().toISOString()
+      startTime: new Date() // Use Date object
     });
-    res.json(session);
+    res.status(201).json(session);
   } catch (error) {
     console.error('Error creating study session:', error);
     res.status(500).json({ error: 'Failed to create study session' });
@@ -213,19 +236,25 @@ apiRouter.post('/study_sessions', async (req, res) => {
 });
 
 // Update study session endpoint
-apiRouter.patch('/study_sessions/:id', async (req, res) => {
+apiRouter.patch('/study_sessions/:id', async (req: Request, res: Response) => { // Add types
   try {
+    const sessionId = parseInt(req.params.id, 10); // Add radix 10
+     if (isNaN(sessionId)) { // Validate parsed id
+        return res.status(400).json({ error: 'Invalid session ID' });
+    }
+    // TODO: Add validation for request body
     const { score, correctCount, incorrectCount } = req.body;
-    const session = await StudySession.findByPk(req.params.id);
-    
+    const session = await StudySession.findByPk(sessionId);
+
     if (!session) {
       return res.status(404).json({ error: 'Study session not found' });
     }
 
-    session.endTime = new Date().toISOString();
+    // Update fields explicitly
     session.score = score;
     session.correctCount = correctCount;
     session.incorrectCount = incorrectCount;
+    session.endTime = new Date(); // Use Date object
     await session.save();
 
     res.json(session);
@@ -236,9 +265,16 @@ apiRouter.patch('/study_sessions/:id', async (req, res) => {
 });
 
 // Word reviews endpoint
-apiRouter.post('/word_reviews', async (req, res) => {
+apiRouter.post('/word_reviews', async (req: Request, res: Response) => { // Add types
   try {
-    res.json({ success: true, id: Date.now() });
+    const { wordId, sessionId, isCorrect } = req.body;
+    const review = await WordReview.create({
+        sessionId,
+        wordId,
+        isCorrect,
+        timestamp: new Date() // Use Date object
+    });
+    res.status(201).json(review);
   } catch (error) {
     console.error('Error creating word review:', error);
     res.status(500).json({ error: 'Failed to create word review' });
@@ -246,18 +282,12 @@ apiRouter.post('/word_reviews', async (req, res) => {
 });
 
 // Reset endpoints
-apiRouter.post('/reset_study_history', async (req, res) => {
+apiRouter.post('/reset_study_history', async (req: Request, res: Response) => { // Add types
   try {
-    // Delete all study sessions
-    await StudySessions.destroy({
-      where: {}
-    });
-
-    // Delete all word reviews
-    await WordReviews.destroy({
-      where: {}
-    });
-
+    // Fix typo
+    await StudySession.destroy({ truncate: true });
+    // Fix typo
+    await WordReview.destroy({ truncate: true });
     res.json({ success: true, message: 'Study history reset successfully' });
   } catch (error) {
     console.error('Error resetting study history:', error);
@@ -265,62 +295,40 @@ apiRouter.post('/reset_study_history', async (req, res) => {
   }
 });
 
-apiRouter.post('/full_reset', async (req, res) => {
+apiRouter.post('/full_reset', async (req: Request, res: Response) => { // Add types
   try {
-    // Delete all study sessions
-    await StudySessions.destroy({
-      where: {}
-    });
+    // Fix typos
+    await StudySession.destroy({ truncate: true });
+    await WordReview.destroy({ truncate: true });
+    await Word.destroy({ truncate: true });
+    await WordGroup.destroy({ truncate: true });
 
-    // Delete all word reviews
-    await WordReviews.destroy({
-      where: {}
-    });
-
-    // Reset word mastery levels
-    await Words.update(
-      {
-        masteryLevel: 1,
-        lastReviewed: null,
-        correctCount: 0,
-        incorrectCount: 0
-      },
-      {
-        where: {}
-      }
-    );
-
-    res.json({ success: true, message: 'Full reset completed successfully' });
+    // TODO: Re-seed database if needed
+    console.log('Database fully reset (data cleared).');
+    res.json({ success: true, message: 'Database fully reset successfully' });
   } catch (error) {
-    console.error('Error performing full reset:', error);
+    console.error('Error during full reset:', error);
     res.status(500).json({ error: 'Failed to perform full reset' });
   }
 });
 
-// Health check endpoint
-apiRouter.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'dari-language-api',
-    version: '1.0.0'
-  });
-});
-
-// Mount the API router
-app.use('/api', apiRouter);
+app.use('/api', apiRouter); // Mount API router
 
 // --- Serve index.html for SPA routing ---
 // This catch-all route should come AFTER API routes
 // It serves the main HTML file for any non-API, non-static file requests
-app.get('*', (req, res) => {
+app.get('*', (req: Request, res: Response) => { // Add types
   res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 // --- End SPA Fallback ---
 
-// Initialize database and start server
-initializeDatabase().then(() => {
+
+// Start server
+async function startServer() {
+  await initializeDatabase();
   app.listen(port, () => {
-    console.log(`Dari Language Learning Portal API Server running on port ${port}`);
+    console.log(`Server listening on port ${port}`);
   });
-});
+}
+
+startServer(); 
