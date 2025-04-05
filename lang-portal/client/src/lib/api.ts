@@ -1,4 +1,4 @@
-/// <reference types="vite/client" />
+// Removed: /// <reference types="vite/client" />
 
 declare module 'vite/client' {
   interface ImportMetaEnv {

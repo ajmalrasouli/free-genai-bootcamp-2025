@@ -3,19 +3,20 @@ from pydantic import BaseModel
 import requests
 from pydub import AudioSegment
 import io
+import json
 
 app = FastAPI()
 
 class TTSRequest(BaseModel):
     text: str
 
-TTS_API_URL = "http://tts-service:5002/tts"
+TTS_API_URL = "http://tts-service:5002/api/tts"
 
 @app.post("/tts")
 async def generate_tts(request: TTSRequest):
     payload = {"text": request.text}
     try:
-        response = requests.post(TTS_API_URL, json=payload)
+        response = requests.post(TTS_API_URL, data=payload)
         response.raise_for_status()
 
         # Add debug logging

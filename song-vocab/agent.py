@@ -90,7 +90,7 @@ class SongLyricsAgent:
         # Initialize Ollama client and tool registry
         logger.info("Initializing Ollama client and tool registry")
         try:
-            self.client = ollama.Client()
+            self.client = ollama.Client(host='http://host.docker.internal:11434')
             self.tools = ToolRegistry(self.lyrics_path, self.vocabulary_path)
             
             # Define the system prompt with clear instructions

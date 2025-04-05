@@ -102,6 +102,32 @@ services:
       - dari-network
     restart: unless-stopped
 
+  # -- Added TTS Service Definition --
+  tts-service:
+    image: ghcr.io/coqui-ai/tts-cpu:latest
+    container_name: phcr_tts-microservice # Renamed slightly to avoid potential conflict if run separately
+    ports:
+      - "5005:5002" # Map internal 5002 to host 5005
+    volumes:
+      - ./models:/root/.local/share/tts # Persist downloaded models
+    environment:
+      # Revert to English model
+      - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
+    # Using the entrypoint and command separately
+    entrypoint: [ "python", "-m", "TTS.server.server" ]
+    # Revert to English model
+    command: [ "--model_name", "tts_models/en/ljspeech/tacotron2-DDC", "--port", "5002" ]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    networks:
+      - dari-network # Connect to the shared network
+    restart: unless-stopped
+  # -- End Added TTS Service --
+
 networks:
   dari-network:
     name: dari-network

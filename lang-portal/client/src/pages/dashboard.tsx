@@ -55,7 +55,7 @@ export function DashboardPage() {
     refetchOnWindowFocus: true,
     refetchInterval: 2000, // Refetch every 2 seconds
     staleTime: 0, // Consider data stale immediately
-    cacheTime: 0 // Don't cache the data
+    gcTime: 0 // Renamed from cacheTime. Don't garbage collect immediately
   });
 
   console.log("Dashboard data:", dashboard);
@@ -245,25 +245,21 @@ export function DashboardPage() {
           <CardContent>
             <div className="space-y-4">
               {recentSessions.length > 0 ? (
-                recentSessions.map((session) => (
+                recentSessions.map((session: StudySession) => (
                   <div key={session.id} className="flex justify-between items-center">
                     <div>
-                      <p className="font-medium">
-                        {new Date(session.startTime).toLocaleDateString()}
-                      </p>
+                      <p className="font-medium">{session.groupName}</p>
                       <p className="text-sm text-muted-foreground">
-                        {session.groupName}
+                        {new Date(session.startTime).toLocaleDateString()} - Score: {session.score ?? 'N/A'}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">
-                        {session.score !== undefined ? `${session.score}%` : "In progress"}
-                      </p>
-                    </div>
+                    <Link href={`/sessions/${session.id}`}>
+                      <Button variant="outline" size="sm">View</Button>
+                    </Link>
                   </div>
                 ))
               ) : (
-                <p className="text-muted-foreground">No recent sessions</p>
+                <p className="text-muted-foreground">No recent sessions.</p>
               )}
             </div>
           </CardContent>
@@ -271,23 +267,22 @@ export function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Words</CardTitle>
+            <CardTitle>Recently Added Words</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {recentWords.length > 0 ? (
-                recentWords.map((word) => (
+                recentWords.map((word: Word) => (
                   <div key={word.id} className="flex justify-between items-center">
                     <div>
-                      <p className="font-medium" dir="rtl">{word.dariWord}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {word.englishTranslation}
-                      </p>
+                      <p className="font-medium">{word.dariWord} ({word.pronunciation})</p>
+                      <p className="text-sm text-muted-foreground">{word.englishTranslation}</p>
                     </div>
+                    {/* Optional: Link to word details or edit */}
                   </div>
                 ))
               ) : (
-                <p className="text-muted-foreground">No recent words</p>
+                <p className="text-muted-foreground">No recent words.</p>
               )}
             </div>
           </CardContent>

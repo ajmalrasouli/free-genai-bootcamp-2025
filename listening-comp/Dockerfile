@@ -22,19 +22,23 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Create working directory and set permissions
 WORKDIR /app
-RUN chown -R $USERNAME:$USERNAME /app
 
-# Switch to non-root user
-USER $USERNAME
-
-# Copy project files
-COPY --chown=$USERNAME:$USERNAME . .
+# Copy requirements first
+COPY --chown=$USERNAME:$USERNAME requirements.txt ./
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the rest of the project files
+COPY --chown=$USERNAME:$USERNAME . .
+
+# Fix permissions after copy
+USER root
+RUN chown -R $USERNAME:$USERNAME /app
+USER $USERNAME
+
 # Expose the port
 EXPOSE 8004
 
-# Command to run the application
-CMD ["python", "backend/main.py"]
+# Command to run the streamlit application
+CMD ["streamlit", "run", "frontend/main.py", "--server.port", "8004", "--server.address", "0.0.0.0"]

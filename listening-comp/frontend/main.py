@@ -4,12 +4,21 @@ import os
 from datetime import datetime
 import json
 
-# Add parent directory to Python path
+# Page config
+st.set_page_config(
+    page_title="Persian Learning Assistant",
+    page_icon="🎧",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Add parent directory to Python path AFTER page config
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
+# Attempt to import backend modules AFTER page config
 try:
     from backend.question_generator import QuestionGenerator
     from backend.audio_generator import AudioGenerator
@@ -20,15 +29,8 @@ try:
     print("Successfully imported backend modules")
 except Exception as e:
     print("Error importing backend modules:", str(e))
+    # Display error within the main app area, not before page config
     st.error(f"Failed to import backend modules: {str(e)}")
-
-# Page config
-st.set_page_config(
-    page_title="Persian Learning Assistant",
-    page_icon="🎧",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
 # Custom CSS
 st.markdown("""

@@ -5,7 +5,6 @@ import path from 'path'; // Import path module
 import { fileURLToPath } from 'url'; // Import url module helpers
 // Import from database.ts now, but keep .js extension for NodeNext module resolution
 import { sequelize, Word, WordGroup, StudySession, WordReview, StudySessionAttributes } from './database.js';
-import { InstanceType } from 'sequelize';
 
 // Helper to get __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);

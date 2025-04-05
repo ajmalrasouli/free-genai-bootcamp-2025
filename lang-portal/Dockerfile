@@ -23,8 +23,6 @@ WORKDIR /app/server
 COPY server ./
 # Ensure all dependencies, including devDependencies with types, are installed
 RUN npm install
-# Rename .mjs to .ts before building
-RUN mv dari-api.mjs index.ts
 # Clean previous build output
 RUN rm -rf dist
 # -- Diagnostic Step --
