@@ -10,6 +10,8 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - dari-network
     restart: unless-stopped
@@ -76,6 +78,9 @@ services:
     container_name: dari-song-vocab
     ports:
       - "8006:8006"
+    environment:
+      # Add environment variable for the search API key
+      - SERP_API_KEY=65eb8e6392443806e5a176529e9991d2032e39b898ac9e3810e0e72d1a566584 # <-- REPLACE WITH YOUR ACTUAL KEY
     networks:
       - dari-network
     restart: unless-stopped
@@ -98,6 +103,8 @@ services:
     container_name: dari-writing-practice
     ports:
       - "8008:8008"
+   
+      
     networks:
       - dari-network
     restart: unless-stopped

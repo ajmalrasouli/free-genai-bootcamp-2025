@@ -112,7 +112,7 @@ class DockerManager:
         
         # Then build and run all containers
         result = subprocess.run(
-            ["docker-compose", "up", "-d"],
+            ["docker", "compose", "up", "-d"],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -127,7 +127,7 @@ class DockerManager:
         logger.info("Stopping all containers")
         
         result = subprocess.run(
-            ["docker-compose", "down"],
+            ["docker", "compose", "down"],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -145,7 +145,7 @@ async def home(request: Request):
     container_status = {}
     try:
         result = subprocess.run(
-            ["docker-compose", "ps", "--services", "--filter", "status=running"],
+            ["docker", "compose", "ps", "--services", "--filter", "status=running"],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -193,7 +193,7 @@ async def start_project(project_id: str):
     try:
         # First stop any existing container for this project
         result = subprocess.run(
-            ["docker-compose", "stop", project_id],
+            ["docker", "compose", "stop", project_id],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -201,7 +201,7 @@ async def start_project(project_id: str):
         
         # Then build and run the specific project
         result = subprocess.run(
-            ["docker-compose", "up", "-d", project_id],
+            ["docker", "compose", "up", "-d", project_id],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True
@@ -223,7 +223,7 @@ async def stop_project(project_id: str):
     try:
         # Stop the specific project using docker-compose
         result = subprocess.run(
-            ["docker-compose", "stop", project_id],
+            ["docker", "compose", "stop", project_id],
             cwd=os.path.dirname(os.path.abspath(__file__)),
             capture_output=True,
             text=True

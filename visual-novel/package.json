@@ -8,10 +8,9 @@
       "dev": "nodemon server.js"
     },
     "dependencies": {
-      "express": "^4.18.2",
-      "howler": "^2.3.2",
-      "three": "^0.160.0",
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0"
+      "express": "latest",
+      "three": "latest",
+      "react": "latest",
+      "react-dom": "latest"
     }
   }

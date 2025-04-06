@@ -97,34 +97,34 @@ class SongLyricsAgent:
             self.system_prompt = """You are a helpful AI assistant that specializes in finding and processing Farsi (Persian) song lyrics. Your task is to find lyrics, extract vocabulary, and save them following these EXACT steps:
 
 1. FIRST: Search for lyrics
-   Tool: search_web_serp(query="متن آهنگ SONG_NAME فارسی")
+   Use: search_web_serp(query="متن آهنگ SONG_NAME فارسی")
    - Always include "متن آهنگ" (lyrics) and "فارسی" (Farsi) in the search
    - Wait for search results
 
 2. THEN: Extract content from the first relevant URL in results
-   Tool: get_page_content(url="URL_FROM_RESULTS")
+   Use: get_page_content(url="URL_FROM_RESULTS")
    - Pick the most relevant URL from search results
    - Wait for content
 
 3. THEN: Generate a song ID
-   Tool: generate_song_id(title="SONG_NAME")
+   Use: generate_song_id(title="SONG_NAME")
    - Use the song name as the title
    - Wait for ID
 
 4. THEN: Extract vocabulary
-   Tool: extract_vocabulary(text="LYRICS_TEXT")
+   Use: extract_vocabulary(text="LYRICS_TEXT")
    - Use the extracted Farsi lyrics text
    - Wait for vocabulary list
 
 5. FINALLY: Save everything
-   Tool: save_results(song_id="ID", lyrics="LYRICS", vocabulary=[VOCAB_LIST])
+   Use: save_results(song_id="ID", lyrics="LYRICS", vocabulary=[VOCAB_LIST])
    - Use the generated song ID
    - Use the extracted lyrics
    - Use the extracted vocabulary
    - Wait for confirmation
 
 IMPORTANT RULES:
-- ALWAYS use the exact format: Tool: tool_name(param="value")
+- ALWAYS use the exact format: tool_name(param="value")
 - ALWAYS wait for each tool's result before proceeding
 - ALWAYS follow the steps in order
 - NEVER skip steps
@@ -132,7 +132,7 @@ IMPORTANT RULES:
 - When finished, return ONLY the song_id
 
 Example correct tool call:
-Tool: search_web_serp(query="متن آهنگ Ebi Ghassam فارسی")"""
+search_web_serp(query="متن آهنگ Ebi Ghassam فارسی")"""
             
             logger.info("Initialization successful")
         except Exception as e:
@@ -141,10 +141,15 @@ Tool: search_web_serp(query="متن آهنگ Ebi Ghassam فارسی")"""
     
     def parse_llm_action(self, content: str) -> Optional[tuple[str, Dict[str, Any]]]:
         """Parse the LLM's response to extract tool name and arguments."""
-        # First, try to match the exact tool call format
+        # First, try to match the exact tool call format (still look for Tool: first)
         tool_pattern = r'Tool:\s*(\w+)\((.*?)\)'
         match = re.search(tool_pattern, content)
-        
+
+        if not match:
+            # If Tool: prefix not found, look for just the function call
+            tool_pattern_no_prefix = r'(\w+)\((.*?)\)'
+            match = re.search(tool_pattern_no_prefix, content)
+
         if not match:
             # Try alternative formats that might appear in the response
             alt_patterns = [
@@ -202,7 +207,7 @@ Tool: search_web_serp(query="متن آهنگ Ebi Ghassam فارسی")"""
             logger.info("Streaming tokens:")
             try:
                 for chunk in self.client.chat(
-                    model="llama3.2:1b",
+                    model="llama3:8b",
                     messages=conversation,
                     options=model_options,
                     stream=True
@@ -221,7 +226,7 @@ Tool: search_web_serp(query="متن آهنگ Ebi Ghassam فارسی")"""
             # Non-streaming response
             try:
                 response = self.client.chat(
-                    model="llama3.2:1b",
+                    model="llama3:8b",
                     messages=conversation,
                     options=model_options
                 )

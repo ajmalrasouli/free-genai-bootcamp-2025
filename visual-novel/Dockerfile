@@ -1,4 +1,6 @@
-FROM node:18-slim
+FROM node:20
+
+WORKDIR /app
 
 # Install system dependencies as root
 RUN apt-get update && apt-get install -y \
@@ -9,33 +11,34 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user with unique UID and GID
+# Copy package files
+COPY package.json ./
+# Explicitly remove potential stale lock file and node_modules
+RUN rm -f package-lock.json
+RUN rm -rf node_modules
+RUN npm cache clean --force
+# Use single install command (without howler)
+RUN npm install --omit=dev
+
+# --- Workaround: Try installing howler with --save-exact --- 
+RUN npm install --save-exact --omit=dev howler@2.2.4
+# --- End Workaround --- 
+
+# Create a non-root user
 ARG USERNAME=appuser
-ARG USER_UID=1004  # Changed from 1000 to 1004
-ARG USER_GID=1004  # Changed from 1000 to 1004
-
-# Create the user
+ARG USER_UID=1004
+ARG USER_GID=1004
 RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        sudo \
-    && rm -rf /var/lib/apt/lists/* \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
-# Create working directory and set permissions
-WORKDIR /app
+# Copy the rest of the project files (will be owned by root initially)
+COPY . .
+
+# Change ownership of the app directory
 RUN chown -R $USERNAME:$USERNAME /app
 
 # Switch to non-root user
 USER $USERNAME
-
-# Install Express.js
-RUN npm install express
-
-# Copy project files
-COPY --chown=$USERNAME:$USERNAME . .
 
 # Expose the port
 EXPOSE 8007
@@ -45,5 +48,5 @@ ENV NODE_ENV=production
 ENV PORT=8007
 ENV HOST=0.0.0.0
 
-# Command to run the application
-CMD ["node", "server.js"]
+# Command to run the application using the package.json start script
+CMD ["npm", "start"]
