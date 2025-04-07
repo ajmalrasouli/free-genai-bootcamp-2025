@@ -16,12 +16,21 @@
         .card:hover {
             transform: translateY(-5px);
         }
-        .launch-btn {
+        .launch-link {
+            display: inline-block; /* Allow padding and centering */
+            text-align: center;
             background-color: #22c55e;
+            color: white;
+            padding: 0.5rem 1rem; /* Equivalent to py-2 px-4 */
+            border-radius: 0.5rem; /* Equivalent to rounded-lg */
+            font-weight: 500; /* Equivalent to font-medium */
+            width: 100%;
+            text-decoration: none;
             transition: background-color 0.2s ease-in-out;
         }
-        .launch-btn:hover {
+        .launch-link:hover {
             background-color: #16a34a;
+            color: white;
         }
         .illustration-icon {
             font-size: 6rem;
@@ -86,117 +95,33 @@
     <div class="sidebar fixed top-0 left-0 h-full bg-white shadow-lg p-6 overflow-y-auto z-40">
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-2">Project Guide</h2>
-            <p class="text-gray-600">Quick overview of our learning tools</p>
+            <p class="text-gray-600">Quick overview of learning tools. Manage services (start/stop) via docker compose commands in your terminal.</p>
         </div>
 
         <div class="space-y-6">
-            <!-- 1. Text Adventure MUD -->
-            <div class="border-l-4 border-orange-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(1)">
-                    <h3 class="font-semibold text-gray-800">1️⃣ Farsi Text Adventure MUD Game</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="1"></i>
+            {% for project_id, project in projects.items() %}
+            <div class="border-l-4 border-{{ project.color }}-500 pl-4">
+                <div class="project-header" onclick="toggleDescription({{ loop.index }})">
+                    <h3 class="font-semibold text-gray-800">{{ loop.index }}️⃣ {{ project.name }}</h3>
+                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="{{ loop.index }}"></i>
                 </div>
-                <div class="project-description mt-2" data-project="1">
-                    <p class="text-gray-600 text-sm">Immersive text-based adventure game for practicing Farsi in an interactive virtual world.</p>
-                </div>
-            </div>
-
-            <!-- 2. ASL Finger Spelling -->
-            <div class="border-l-4 border-green-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(2)">
-                    <h3 class="font-semibold text-gray-800">2️⃣ ASL Finger Spelling Application</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="2"></i>
-                </div>
-                <div class="project-description mt-2" data-project="2">
-                    <p class="text-gray-600 text-sm">Interactive tool for learning and practicing American Sign Language finger spelling.</p>
+                <div class="project-description mt-2" data-project="{{ loop.index }}">
+                    <p class="text-gray-600 text-sm">{{ project.description }}</p>
                 </div>
             </div>
-
-            <!-- 3. Language Portal -->
-            <div class="border-l-4 border-indigo-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(3)">
-                    <h3 class="font-semibold text-gray-800">3️⃣ Language Learning Portal</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="3"></i>
-                </div>
-                <div class="project-description mt-2" data-project="3">
-                    <p class="text-gray-600 text-sm">Centralized platform for accessing all language learning resources and tracking progress.</p>
-                </div>
-            </div>
-
-            <!-- 4. Persian Learning Assistant -->
-            <div class="border-l-4 border-blue-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(4)">
-                    <h3 class="font-semibold text-gray-800">4️⃣ Persian Learning Assistant</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="4"></i>
-                </div>
-                <div class="project-description mt-2" data-project="4">
-                    <p class="text-gray-600 text-sm">Interactive listening comprehension system for Persian language learning.</p>
-                </div>
-            </div>
-
-            <!-- 5. Text-to-Speech Microservice -->
-            <div class="border-l-4 border-indigo-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(5)">
-                    <h3 class="font-semibold text-gray-800">5️⃣ Text-to-Speech Microservice</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="5"></i>
-                </div>
-                <div class="project-description mt-2" data-project="5">
-                    <p class="text-gray-600 text-sm">Microservice for converting text to speech in multiple languages.</p>
-                </div>
-            </div>
-
-            <!-- 6. Farsi Song Vocabulary Generator -->
-            <div class="border-l-4 border-purple-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(6)">
-                    <h3 class="font-semibold text-gray-800">6️⃣ Farsi Song Vocabulary Generator</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="6"></i>
-                </div>
-                <div class="project-description mt-2" data-project="6">
-                    <p class="text-gray-600 text-sm">Generate vocabulary lists from Farsi songs for language learning.</p>
-                </div>
-            </div>
-
-            <!-- 7. Farsi Learning Visual Novel -->
-            <div class="border-l-4 border-pink-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(7)">
-                    <h3 class="font-semibold text-gray-800">7️⃣ Farsi Learning Visual Novel</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="7"></i>
-                </div>
-                <div class="project-description mt-2" data-project="7">
-                    <p class="text-gray-600 text-sm">Interactive visual novel for immersive Farsi language learning.</p>
-                </div>
-            </div>
-
-            <!-- 8. Farsi Writing Practice App -->
-            <div class="border-l-4 border-green-500 pl-4">
-                <div class="project-header" onclick="toggleDescription(8)">
-                    <h3 class="font-semibold text-gray-800">8️⃣ Farsi Writing Practice App</h3>
-                    <i class="fas fa-chevron-down text-gray-400 toggle-icon" data-project="8"></i>
-                </div>
-                <div class="project-description mt-2" data-project="8">
-                    <p class="text-gray-600 text-sm">Interactive writing practice application for Farsi language learners.</p>
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content p-8">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-8">
-                <button onclick="startAllProjects()" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 mr-4">
-                    Start All Projects
-                </button>
-                <button onclick="stopAllProjects()" class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
-                    Stop All Projects
-                </button>
-            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <!-- 1. Text Adventure MUD -->
+                {% for project_id, project in projects.items() %}
                 <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-orange-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-dungeon illustration-icon text-orange-500"></i>
-                        {% if container_status.get('fa-mud', False) %}
+                    <div class="bg-{{ project.color }}-100 p-6 flex justify-center items-center h-48 relative">
+                        <i class="fas {{ project.icon }} illustration-icon text-{{ project.color }}-500"></i>
+                        {% if container_status.get(project_id, False) %}
                         <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                             <i class="fas fa-check-circle mr-1"></i>Running
                         </div>
@@ -207,307 +132,18 @@
                         {% endif %}
                     </div>
                     <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">1️⃣ Farsi Text Adventure MUD</h2>
-                        <button onclick="startProject('fa-mud')" class="launch-btn w-full py-2 px-4 rounded-lg text-white font-medium">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ loop.index }}️⃣ {{ project.name }}</h2>
+                        <a href="{{ project.external_url }}" target="_blank" class="launch-link">
                             Launch
-                        </button>
+                        </a>
                     </div>
                 </div>
-
-                <!-- 2. ASL Finger Spelling -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-green-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-american-sign-language-interpreting illustration-icon text-green-500"></i>
-                        {% if container_status.get('finger-spelling', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">2️⃣ ASL Finger Spelling</h2>
-                        <button onclick="startProject('finger-spelling')" class="launch-btn w-full py-2 px-4 rounded-lg text-white font-medium">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 3. Language Portal -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-language illustration-icon text-indigo-500"></i>
-                        {% if container_status.get('lang-portal', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">3️⃣ Language Learning Portal</h2>
-                        <button onclick="startProject('lang-portal')" class="launch-btn w-full py-2 px-4 rounded-lg text-white font-medium">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 4. Persian Learning Assistant -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-blue-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-headphones-alt illustration-icon text-blue-500"></i>
-                        {% if container_status.get('listening-comp', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">4️⃣ Persian Learning Assistant</h3>
-                        <p class="text-gray-600 mb-4">Interactive listening comprehension system for Persian language learning.</p>
-                        <button onclick="startProject('listening-comp')" class="launch-btn px-6 py-2 rounded-lg text-white">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 5. Text-to-Speech Microservice -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-indigo-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-microphone illustration-icon text-indigo-500"></i>
-                        {% if container_status.get('opea-comps', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">5️⃣ Text-to-Speech Microservice</h3>
-                        <p class="text-gray-600 mb-4">Microservice for converting text to speech in multiple languages.</p>
-                        <button onclick="startProject('opea-comps')" class="launch-btn px-6 py-2 rounded-lg text-white">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 6. Farsi Song Vocabulary Generator -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-purple-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-music illustration-icon text-purple-500"></i>
-                        {% if container_status.get('song-vocab', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">6️⃣ Farsi Song Vocabulary Generator</h3>
-                        <p class="text-gray-600 mb-4">Generate vocabulary lists from Farsi songs for language learning.</p>
-                        <button onclick="startProject('song-vocab')" class="launch-btn px-6 py-2 rounded-lg text-white">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 7. Farsi Learning Visual Novel -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-pink-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-book-reader illustration-icon text-pink-500"></i>
-                        {% if container_status.get('visual-novel', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">7️⃣ Farsi Learning Visual Novel</h3>
-                        <p class="text-gray-600 mb-4">Interactive visual novel for immersive Farsi language learning.</p>
-                        <button onclick="startProject('visual-novel')" class="launch-btn px-6 py-2 rounded-lg text-white">
-                            Launch
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 8. Farsi Writing Practice App -->
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
-                    <div class="bg-green-100 p-6 flex justify-center items-center h-48 relative">
-                        <i class="fas fa-pencil-alt illustration-icon text-green-500"></i>
-                        {% if container_status.get('writing-practice', False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
-                        </div>
-                        {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-2">8️⃣ Farsi Writing Practice App</h3>
-                        <p class="text-gray-600 mb-4">Interactive writing practice application for Farsi language learners.</p>
-                        <button onclick="startProject('writing-practice')" class="launch-btn px-6 py-2 rounded-lg text-white">
-                            Launch
-                        </button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
     <script>
-        async function startAllProjects() {
-            try {
-                const response = await fetch('/start-all', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                const data = await response.json();
-                if (response.ok) {
-                    alert('All projects started successfully!');
-                    window.location.reload();
-                } else {
-                    alert('Error starting projects: ' + data.detail);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error starting projects: ' + error.message);
-            }
-        }
-
-        async function stopAllProjects() {
-            try {
-                const response = await fetch('/stop-all', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                const data = await response.json();
-                if (response.ok) {
-                    alert('All projects stopped successfully!');
-                    window.location.reload();
-                } else {
-                    alert('Error stopping projects: ' + data.detail);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error stopping projects: ' + error.message);
-            }
-        }
-
-        async function startProject(projectId) {
-            try {
-                // Show loading state
-                const button = event.target;
-                const originalText = button.textContent;
-                button.textContent = 'Starting...';
-                button.disabled = true;
-                
-                const response = await fetch(`/start/${projectId}`, {
-                    method: 'POST',
-                });
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    // Wait a moment for the container to fully initialize
-                    setTimeout(() => {
-                        button.textContent = 'Launching...';
-                        // Check if container is ready before opening
-                        checkContainerStatus(projectId, () => {
-                            window.open(`http://localhost:${getProjectPort(projectId)}`, '_blank');
-                            button.textContent = originalText;
-                            button.disabled = false;
-                        });
-                    }, 2000);
-                } else {
-                    alert(data.message);
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error starting project: ' + error);
-                event.target.textContent = 'Launch';
-                event.target.disabled = false;
-            }
-        }
-
-        async function checkContainerStatus(projectId, callback) {
-            try {
-                // Simple health check - in a real app, you might want to implement
-                // a proper health check endpoint for each service
-                const maxAttempts = 10;
-                let attempts = 0;
-                
-                const checkStatus = async () => {
-                    attempts++;
-                    try {
-                        // Try to fetch the project URL to see if it's responding
-                        const response = await fetch(`http://localhost:${getProjectPort(projectId)}`, {
-                            mode: 'no-cors', // This allows us to check if the server is up without CORS issues
-                            method: 'HEAD'
-                        });
-                        
-                        // If we get here, the server is responding
-                        callback();
-                    } catch (error) {
-                        if (attempts < maxAttempts) {
-                            // Try again after a delay
-                            setTimeout(checkStatus, 1000);
-                        } else {
-                            alert(`Project ${projectId} is not responding. It may still be starting up or there might be an issue.`);
-                            callback(); // Still open the URL even if we can't confirm it's ready
-                        }
-                    }
-                };
-                
-                checkStatus();
-            } catch (error) {
-                console.error('Error checking container status:', error);
-                callback(); // Proceed anyway
-            }
-        }
-
-        function getProjectPort(projectId) {
-            const ports = {
-                'writing-practice': 8008,
-                'listening-comp': 8004,
-                'song-vocab': 8006,
-                'opea-comps': 8005,
-                'finger-spelling': 8002,
-                'lang-portal': 8003,
-                'visual-novel': 8007,
-                'fa-mud': 8001
-            };
-            return ports[projectId];
-        }
-
         // Sidebar Toggle
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
@@ -517,17 +153,17 @@
         document.addEventListener('click', function(event) {
             const sidebar = document.querySelector('.sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
-            
+
             if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
         });
 
         // Project description toggle
-        function toggleDescription(projectId) {
-            const description = document.querySelector(`.project-description[data-project="${projectId}"]`);
-            const icon = document.querySelector(`.toggle-icon[data-project="${projectId}"]`);
-            
+        function toggleDescription(projectIndex) {
+            const description = document.querySelector(`.project-description[data-project="${projectIndex}"]`);
+            const icon = document.querySelector(`.toggle-icon[data-project="${projectIndex}"]`);
+
             description.classList.toggle('active');
             icon.classList.toggle('active');
         }

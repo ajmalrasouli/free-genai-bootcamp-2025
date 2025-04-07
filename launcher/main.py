@@ -14,233 +14,183 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="GenAI Learning Platform Launcher")
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# Check for static directory existence
+static_dir = Path("static")
+if not static_dir.is_dir():
+    logger.warning(f"Static directory '{static_dir}' not found. Creating it.")
+    static_dir.mkdir(parents=True, exist_ok=True) # Create if it doesn't exist
 
-# Project configurations
-PROJECTS = {
+# Mount static files
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+templates_dir = Path("templates")
+if not templates_dir.is_dir():
+     # If templates are essential, maybe raise an error or log critical
+    logger.error(f"Templates directory '{templates_dir}' not found! UI may not work.")
+    # Or create it if it's acceptable for it to be empty initially
+    # templates_dir.mkdir(parents=True, exist_ok=True)
+templates = Jinja2Templates(directory=templates_dir)
+
+# Project configurations (Keep this)
+PROJECTS = { # Ensure this matches service names in docker-compose.yml
     "fa-mud": {
         "name": "Farsi Text Adventure MUD Game",
         "port": 8001,
-        "image": "dari-fa-mud",
-        "build_context": "../fa-mud",
         "category": "gaming",
-        "internal_url": "http://dari-fa-mud:8001",
+        "icon": "fa-dungeon",
+        "color": "orange",
+        "description": "Immersive text-based adventure game for practicing Farsi.",
         "external_url": "http://localhost:8001"
     },
     "finger-spelling": {
-        "name": "Finger Spelling Application",
+        "name": "ASL Finger Spelling App",
         "port": 8002,
-        "image": "dari-finger-spelling",
-        "build_context": "../finger-spelling",
         "category": "language",
-        "internal_url": "http://dari-finger-spelling:8002",
+        "icon": "fa-american-sign-language-interpreting",
+        "color": "green",
+        "description": "Interactive tool for learning ASL finger spelling.",
         "external_url": "http://localhost:8002"
     },
     "lang-portal": {
         "name": "Language Learning Portal",
         "port": 8003,
-        "image": "dari-lang-portal",
-        "build_context": "../lang-portal",
         "category": "language",
-        "internal_url": "http://dari-lang-portal:8003",
+        "icon": "fa-language",
+        "color": "indigo",
+        "description": "Centralized platform for accessing language resources.",
         "external_url": "http://localhost:8003"
     },
     "listening-comp": {
         "name": "Persian Learning Assistant",
         "port": 8004,
-        "image": "dari-listening-comp",
-        "build_context": "../listening-comp",
         "category": "language",
-        "internal_url": "http://dari-listening-comp:8004",
+        "icon": "fa-headphones-alt",
+        "color": "blue",
+        "description": "Interactive listening comprehension system for Persian.",
         "external_url": "http://localhost:8004"
     },
     "opea-comps": {
         "name": "Text-to-Speech Microservice",
         "port": 8005,
-        "image": "dari-opea-comps",
-        "build_context": "../opea-comps",
         "category": "tools",
-        "internal_url": "http://dari-opea-comps:8005",
-        "external_url": "http://localhost:8005"
+        "icon": "fa-microphone",
+        "color": "indigo",
+        "description": "Microservice for converting text to speech.",
+        "external_url": "http://localhost:8005/docs"
     },
     "song-vocab": {
-        "name": "Farsi Song Vocabulary Generator",
+        "name": "Farsi Song Vocabulary",
         "port": 8006,
-        "image": "dari-song-vocab",
-        "build_context": "../song-vocab",
         "category": "language",
-        "internal_url": "http://dari-song-vocab:8006",
-        "external_url": "http://localhost:8006"
+        "icon": "fa-music",
+        "color": "purple",
+        "description": "Generate vocabulary lists from Farsi songs.",
+        "external_url": "http://localhost:8006/docs"
     },
     "visual-novel": {
-        "name": "Farsi Learning Visual Novel",
+        "name": "Farsi Visual Novel",
         "port": 8007,
-        "image": "dari-visual-novel",
-        "build_context": "../visual-novel",
         "category": "gaming",
-        "internal_url": "http://dari-visual-novel:8007",
+        "icon": "fa-book-reader",
+        "color": "pink",
+        "description": "Interactive visual novel for immersive Farsi learning.",
         "external_url": "http://localhost:8007"
     },
     "writing-practice": {
         "name": "Farsi Writing Practice App",
         "port": 8008,
-        "image": "dari-writing-practice",
-        "build_context": "../writing-practice",
         "category": "language",
-        "internal_url": "http://dari-writing-practice:8008",
+        "icon": "fa-pencil-alt",
+        "color": "green",
+        "description": "Interactive writing practice application for Farsi.",
         "external_url": "http://localhost:8008"
     }
+    # Add tts-service details if it should be shown
+    # "tts-service": {
+    #     "name": "TTS Microservice (Coqui)",
+    #     "port": 5005,
+    #     "category": "tools",
+    #     "icon": "fa-bullhorn",
+    #     "color": "gray",
+    #     "description": "Backend text-to-speech engine.",
+    #     "external_url": "http://localhost:5005" # May not have a UI
+    # }
 }
 
-class DockerManager:
-    def __init__(self):
-        self.running_containers = {}
-        
-    def build_and_run_all(self):
-        """Build and run all containers using docker-compose"""
-        logger.info("Building and running all containers")
-        
-        # First stop any existing containers
-        result = subprocess.run(
-            ["docker-compose", "down"],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        # Then build and run all containers
-        result = subprocess.run(
-            ["docker", "compose", "up", "-d"],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            logger.error(f"Error running docker-compose: {result.stderr}")
-            raise Exception(f"Failed to run docker-compose: {result.stderr}")
-            
-    def stop_all(self):
-        """Stop all containers"""
-        logger.info("Stopping all containers")
-        
-        result = subprocess.run(
-            ["docker", "compose", "down"],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            logger.error(f"Error stopping containers: {result.stderr}")
-            raise Exception(f"Failed to stop containers: {result.stderr}")
+# Removed DockerManager class
 
-docker_manager = DockerManager()
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     # Check container status and add it to the projects data
     container_status = {}
+    compose_file = "/app/docker-compose.yml"
+    project_dir = "/app"
     try:
+        # Use 'docker compose' to get running services
+        cmd = [
+            "docker", "compose",
+            "-f", compose_file,
+            "--project-directory", project_dir,
+            "ps", "--services", "--filter", "status=running"
+        ]
+        logger.info(f"Checking running services using command: {' '.join(cmd)}")
         result = subprocess.run(
-            ["docker", "compose", "ps", "--services", "--filter", "status=running"],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
+            cmd,
+            cwd=project_dir,
             capture_output=True,
-            text=True
+            text=True,
+            check=False # Don't raise error if command fails, just log
         )
-        running_services = result.stdout.strip().split('\n')
-        running_services = [s for s in running_services if s]  # Remove empty strings
-        
-        for project_id in PROJECTS:
-            container_status[project_id] = project_id in running_services
-    except Exception as e:
-        logger.error(f"Error checking container status: {str(e)}")
-        # Default to all containers not running if we can't check
+
+        if result.returncode != 0:
+            logger.error(f"Error checking container status: {result.stderr}")
+            # Default to all containers not running if command fails
+            container_status = {project_id: False for project_id in PROJECTS}
+        else:
+            running_services = result.stdout.strip().split('\n')
+            running_services = {s for s in running_services if s} # Use a set for faster lookup
+            logger.info(f"Running services detected: {running_services}")
+            for project_id in PROJECTS:
+                container_status[project_id] = project_id in running_services
+
+    except FileNotFoundError as e:
+        logger.error(f"Error checking container status: 'docker' command not found. {e}")
         container_status = {project_id: False for project_id in PROJECTS}
-    
+    except Exception as e:
+        logger.error(f"Unexpected error checking container status: {str(e)}", exc_info=True)
+        container_status = {project_id: False for project_id in PROJECTS}
+
+    # Add index to projects for easier looping in template
+    projects_with_index = {k: {**v, 'id': k, 'index': i+1} for i, (k, v) in enumerate(PROJECTS.items())}
+
     return templates.TemplateResponse(
-        "index.html", 
+        "index.html",
         {
-            "request": request, 
-            "projects": PROJECTS,
+            "request": request,
+            "projects": projects_with_index, # Pass modified dict
             "container_status": container_status
         }
     )
 
-@app.post("/start-all")
-async def start_all():
-    try:
-        docker_manager.build_and_run_all()
-        return {"message": "All containers started successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/stop-all")
-async def stop_all():
-    try:
-        docker_manager.stop_all()
-        return {"message": "All containers stopped successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/start/{project_id}")
-async def start_project(project_id: str):
-    if project_id not in PROJECTS:
-        raise HTTPException(status_code=404, detail="Project not found")
-    
-    try:
-        # First stop any existing container for this project
-        result = subprocess.run(
-            ["docker", "compose", "stop", project_id],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        # Then build and run the specific project
-        result = subprocess.run(
-            ["docker", "compose", "up", "-d", project_id],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            raise Exception(f"Failed to start {project_id}: {result.stderr}")
-            
-        return {"status": "success", "message": f"Project {project_id} started"}
-    except Exception as e:
-        logger.error(f"Error starting {project_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/stop/{project_id}")
-async def stop_project(project_id: str):
-    if project_id not in PROJECTS:
-        raise HTTPException(status_code=404, detail="Project not found")
-    
-    try:
-        # Stop the specific project using docker-compose
-        result = subprocess.run(
-            ["docker", "compose", "stop", project_id],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            capture_output=True,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            raise Exception(f"Failed to stop {project_id}: {result.stderr}")
-            
-        return {"status": "success", "message": f"Project {project_id} stopped"}
-    except Exception as e:
-        logger.error(f"Error stopping {project_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+# Removed /start-all endpoint
+# Removed /stop-all endpoint
+# Removed /start/{project_id} endpoint
+# Removed /stop/{project_id} endpoint
 
 if __name__ == "__main__":
     import uvicorn
     try:
-        print("Starting server on http://127.0.0.1:3000")
+        # Ensure Docker is accessible before starting
+        try:
+            subprocess.run(["docker", "info"], check=True, capture_output=True)
+            logger.info("Docker daemon connection verified.")
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            logger.critical(f"Failed to connect to Docker daemon: {e}")
+            logger.critical("The launcher requires Docker access to check service status.")
+            # Optionally exit if Docker isn't working
+            # exit(1)
+
+        print(f"Starting GenAI Platform Launcher UI on http://0.0.0.0:3000")
         uvicorn.run(app, host="0.0.0.0", port=3000)
     except Exception as e:
         logger.error(f"Server error: {str(e)}")
