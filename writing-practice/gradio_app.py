@@ -23,7 +23,7 @@ def normalize_farsi_text(text):
     if not isinstance(text, str):
         return ""
     # Remove any non-Persian characters (except spaces) and extra spaces
-    text = re.sub(r'[^\u0600-\u06FF\s]', '', text) 
+    text = re.sub(r'[^\u0600-\u06FF\s]', '', text)
     text = ' '.join(text.split())
     
     # Normalize common character variations
@@ -36,7 +36,7 @@ def normalize_farsi_text(text):
     
     for old, new in replacements.items():
         text = text.replace(old, new)
-        
+    
     return text
 
 def process_farsi_text_for_display(text):
@@ -80,7 +80,7 @@ def check_tesseract_installation():
             pytesseract.pytesseract.tesseract_cmd = path
             logger.info(f"Using Tesseract found at: {path}")
             return True
-            
+    
     # Check if tesseract is in PATH (for Linux/macOS primarily)
     try:
         # Try running tesseract command to see if it's in PATH
@@ -93,14 +93,14 @@ def check_tesseract_installation():
         logger.error("Tesseract-OCR not found in standard locations or PATH.")
         logger.error("Please install Tesseract and ensure 'fas' language data is installed.")
         logger.error("Optionally, set the TESSERACT_CMD environment variable to its path.")
-        return False
+    return False
 
 # --- Prompt Loading ---
 
 def load_prompts():
     """Load prompts from YAML file"""
     try:
-        with open('prompts.yaml', 'r', encoding='utf-8') as f:
+    with open('prompts.yaml', 'r', encoding='utf-8') as f:
             prompts = yaml.safe_load(f)
             # Basic validation
             if not all(k in prompts for k in ['translation', 'grading']):
@@ -173,7 +173,7 @@ class FarsiWritingApp:
                  # Basic cleaning
                 sentence = sentence.replace("\"", "") 
                 logger.info(f"Generated English sentence: {sentence}")
-                return sentence
+            return sentence
             else:
                  logger.error(f"Gemini response did not contain text parts. Response: {response}")
                  # Check for blocked prompts
@@ -324,13 +324,13 @@ def create_ui():
                     interactive=False,
                     scale=1 # Adjust scale as needed
                 )
-            
+                
             with gr.Column(scale=2):
                 image_input = gr.Image(
                     label="Upload Your Handwritten Farsi", 
                     type="filepath", # Use filepath for Tesseract
                     height=300
-                ) 
+                )
                 submit_btn = gr.Button("Submit for Review", variant="secondary")
                 
                 gr.Markdown("### Review")
@@ -357,7 +357,7 @@ def create_ui():
         def handle_submission(image_filepath, current_sentence):
             # Pass the filepath directly
             return app.grade_submission(image_filepath, current_sentence)
-            
+        
         submit_btn.click(
             fn=handle_submission,
             # Inputs: image component output and the state variable
@@ -371,7 +371,7 @@ def create_ui():
              fn=handle_generate_sentence,
              outputs=[english_sentence_display, current_english_sentence_state]
         )
-
+    
     return interface
 
 # --- Main Execution Block ---
@@ -389,7 +389,7 @@ if __name__ == "__main__":
         load_prompts()
         logger.info("Prompts loaded successfully.")
         
-        interface = create_ui()
+    interface = create_ui()
         
         # Read host and port from environment variables for Docker compatibility
         server_name = os.environ.get('HOST', '0.0.0.0') # Default to 0.0.0.0 for Docker

@@ -342,7 +342,7 @@ This project uses Docker Compose to manage and run all the different services.
 
 3.  **Build and Run All Services:**
     *   From the `Launcher` directory, run:
-        ```bash
+```bash
         docker-compose up -d
         ```
     *   This command will build the images for all services (which might take some time on the first run) and start them in the background.

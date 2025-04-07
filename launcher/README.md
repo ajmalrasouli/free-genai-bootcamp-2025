@@ -31,7 +31,7 @@ This launcher is intended to be run using Docker Compose alongside the other pro
 1.  **Prerequisites:** Ensure Docker and Docker Compose are installed on your system.
 2.  **Environment Variables:** Create a `.env` file in this `Launcher` directory (you can copy `.env.template`) and add any necessary API keys (like `GOOGLE_API_KEY` if required by other services managed indirectly).
 3.  **Run All Services:** From this `Launcher` directory, start all defined services:
-    ```bash
+```bash
     docker-compose up -d
     ```
 4.  **Access Launcher:** Open your browser to `http://localhost:3000`.
