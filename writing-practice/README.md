@@ -1,105 +1,50 @@
 # Farsi Writing Practice App
 
-A simple and interactive application to help users practice writing in Farsi (Persian). The app provides English sentences and verifies your handwritten Farsi translations using OCR technology.
+An interactive application using Gradio to help users practice writing in Farsi (Persian). The app provides English sentences, uses Tesseract OCR to read handwritten Farsi images, and provides translation and grading feedback using the Google Gemini API.
 
 ## Features
 
-- Random English sentences for translation practice
-- Upload and verify handwritten Farsi text
-- Real-time OCR processing with Tesseract
-- Immediate feedback on translation accuracy
-- Proper RTL (Right-to-Left) text display
-- Support for Persian character variations
+- Random English sentences generated for translation practice.
+- Upload handwritten Farsi text images.
+- OCR processing using Tesseract with Persian language support.
+- Literal translation of transcribed text via Google Gemini API.
+- Graded feedback (S/A/B/C) on accuracy, grammar, and style via Google Gemini API.
+- Proper RTL (Right-to-Left) text display for Farsi in a Textbox.
 
-## Prerequisites
+## Running the Application (via Docker Compose)
 
-1. Python 3.7 or higher
-2. Tesseract-OCR with Persian language support
+This service is designed to be run as part of the main multi-project setup using Docker Compose from the `Launcher` directory.
 
-### Installing Tesseract-OCR
+1.  **Ensure Prerequisites:** Make sure you have Docker and Docker Compose installed.
+2.  **Configure API Key:** Set your `GOOGLE_API_KEY` in the `.env` file within the `Launcher` directory.
+3.  **Start Services:** Navigate to the `Launcher` directory in your terminal and run:
+    ```bash
+    docker-compose up -d
+    ```
+4.  **Access:** Open your web browser and go to `http://localhost:8008`.
 
-1. Download Tesseract installer from: https://github.com/UB-Mannheim/tesseract/wiki
-2. During installation:
-   - Select "Persian" language pack
-   - Install to the default location (C:\Program Files\Tesseract-OCR)
-3. Restart the application after installation
+## Configuration
 
-## Installation
+-   **`GOOGLE_API_KEY`:** The application requires a Google API Key with access to the Gemini API (e.g., `gemini-1.5-flash`). This key must be provided as an environment variable, typically set via the `.env` file in the `Launcher` directory.
+-   **`prompts.yaml`:** Contains the prompts used to interact with the Google Gemini API for translation and grading. Located in the `writing-practice` directory.
+-   **Tesseract:** Requires Tesseract OCR installed *inside the Docker container* along with the Farsi language pack (`tesseract-ocr-fas`). This is handled by the `writing-practice/Dockerfile`.
 
-1. Clone this repository:
-```bash
-git clone [repository-url]
-cd writing-practice
-```
+## Dependencies (Installed via Dockerfile)
 
-2. Install required Python packages:
-```bash
-pip install -r requirements.txt
-```
-
-## Usage
-
-1. Start the application:
-```bash
-python gradio_app.py
-```
-
-2. The web interface will open in your browser
-
-3. Practice writing:
-   - Click "Get New Sentence" to receive an English sentence
-   - Write the Farsi translation on paper
-   - Take a photo or scan your writing
-   - Upload the image
-   - Click "Submit" to verify your translation
-
-4. View Results:
-   - Your written text will be displayed with proper RTL formatting
-   - You'll see if your translation is correct or incorrect
-   - If incorrect, the expected translation will be shown
-
-## Supported Translations
-
-The app currently supports common phrases including:
-- Welcome (خوش آمدید)
-- Hello (سلام)
-- Good morning (صبح بخیر)
-- Good night (شب بخیر)
-- Thank you (متشکرم)
-- You're welcome (خواهش می‌کنم)
-- How are you? (حال شما چطور است؟)
-- I am fine (من خوب هستم)
-- What is your name? (اسم شما چیست؟)
-- Nice to meet you (از آشنایی با شما خوشحالم)
+-   `gradio`
+-   `google-generativeai`
+-   `pytesseract`
+-   `Pillow`
+-   `arabic-reshaper`
+-   `python-bidi`
+-   `PyYAML`
+-   `python-dotenv`
 
 ## Troubleshooting
 
-If you encounter issues:
-
-1. **Text Not Detected**:
-   - Ensure your writing is clear and well-lit
-   - Use dark ink on white paper
-   - Make sure the image is focused
-
-2. **Incorrect Recognition**:
-   - Check the debug output to see what text was detected
-   - Ensure Tesseract is properly installed with Persian support
-   - Try writing more clearly or adjusting the image quality
-
-3. **Installation Issues**:
-   - Verify Tesseract is installed in the default location
-   - Ensure the Persian language pack is installed
-   - Check if all required Python packages are installed
-
-## Dependencies
-
-- gradio
-- pytesseract
-- Pillow
-- arabic-reshaper
-- python-bidi
-- PyYAML
-- logging
+-   **OCR Issues:** Ensure Tesseract is correctly installed in the Docker image and that the writing is clear in the uploaded image.
+-   **API Errors:** Check that the `GOOGLE_API_KEY` is correctly set in the `Launcher/.env` file and that the key is valid and has quota for the Gemini API.
+-   **RTL Display:** Farsi text is displayed using a Gradio Textbox component. Ensure required libraries (`arabic-reshaper`, `python-bidi`) are installed.
 
 ## Contributing
 

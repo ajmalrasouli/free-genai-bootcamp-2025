@@ -182,3 +182,31 @@
     - Ambient sounds
 
 Initial project setup and core planning completed. Established the foundation for our Farsi language learning visual novel.
+
+## April 7, 2025
+
+### Docker Integration and Troubleshooting (Launcher & Writing Practice)
+
+-   **Initial Setup:** Configured `docker-compose.yml` in the `Launcher` directory to manage all bootcamp project services.
+-   **Writing Practice Integration:**
+    -   Integrated the Farsi Writing Practice app (`writing-practice`) as a service.
+    -   Troubleshot initial `FileNotFoundError` for `prompts.yaml` by ensuring it was present.
+    -   Resolved Docker port mapping issues (`EXPOSE` vs. runtime port) by ensuring Gradio launched on the correct host (`0.0.0.0`) and exposed port (`8008`) via environment variables.
+    -   Switched LLM provider from OpenAI to Google Gemini due to API key quota issues.
+        -   Updated `requirements.txt` to include `google-generativeai`.
+        -   Modified `gradio_app.py` to use the Gemini API for translation and grading.
+        -   Configured `GOOGLE_API_KEY` via `.env` file in `Launcher`.
+    -   Debugged Farsi text rendering issues in the Gradio UI:
+        -   Initially attempted using `gr.HTML` with `arabic-reshaper` and `bidi.algorithm.get_display`, which resulted in garbled output.
+        -   Tried `gr.Textbox(rtl=True)` with reshaped text, which also failed.
+        -   Resolved by using `gr.Textbox` (without `rtl=True`) and passing the raw string processed by both `arabic_reshaper.reshape` and `bidi.algorithm.get_display`. The inherent Unicode directionality characters handled the display correctly in the standard textbox.
+-   **Launcher Service Troubleshooting:**
+    -   Simplified the Launcher's role to be a status dashboard and access portal, removing container start/stop functionality from the UI.
+    -   Resolved errors preventing the Launcher backend (`main.py`) from executing `docker compose` commands inside its container:
+        -   Added volume mount for `/var/run/docker.sock` in `docker-compose.yml`.
+        -   Modified `Launcher/Dockerfile` to correctly install `docker-ce-cli` and `docker-compose-plugin` using the official `get.docker.com` script after `apt` methods failed.
+        -   Initially attempted permission fixes by adding `appuser` to the `docker` group and matching GIDs, but ultimately switched to running the `launcher` container as `root` for simplicity to resolve persistent socket permission errors.
+    -   Fixed `RuntimeError: Directory 'static' not found` by creating the `Launcher/static` directory.
+    -   Corrected frontend JavaScript in `index.html` to properly construct links (initially was opening "undefined").
+    -   Modified the `external_url` for FastAPI backend services (`opea-comps`, `song-vocab`) in `main.py` to point to `/docs` for a better user experience when launching.
+-   **Final State:** All 8(+1 TTS) services are running correctly via `docker-compose up -d` from the `Launcher` directory. The Launcher UI at `http://localhost:3000` displays service status and provides direct links to each running application.

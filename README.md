@@ -15,7 +15,7 @@
 
 ---
 
-This repository contains projects developed during the 2025 GenAI Bootcamp, focusing on practical applications of generative AI and language technologies, particularly for Persian/Dari language learning.
+This repository contains projects developed during the 2025 GenAI Bootcamp, focusing on practical applications of generative AI and language technologies, particularly for Persian/Dari language learning. All projects are designed to be run via Docker Compose from the central `Launcher` directory.
 
 ## 🏗️ GenAI System Architecture
 
@@ -70,6 +70,15 @@ This repository contains projects developed during the 2025 GenAI Bootcamp, focu
   ## 🚀 Projects Overview
   
 </div>
+
+### 0️⃣ GenAI Platform Launcher (launcher)
+A simple web dashboard (running on port 3000) that provides direct links to launch the various learning applications and shows their current running status (via `docker compose ps`). Note: Starting/stopping services must be done manually via `docker compose` commands on the host machine.
+
+**Technical Stack:**
+- 🐍 Python 3.10+
+- 🚀 FastAPI & Uvicorn
+- ✨ Jinja2 Templates
+- 🐳 Docker & Docker Compose
 
 ### 1️⃣ Farsi Text Adventure MUD Game (fa-mud)
 A text-based adventure game that helps users learn Farsi vocabulary through an immersive MUD (Multi-User Dungeon) experience.
@@ -183,21 +192,23 @@ A web-based visual novel for learning Farsi, featuring interactive dialogue, lan
 - 🔤 Google Fonts (Noto Naskh Arabic) for Farsi text
 
 ### 8️⃣ Farsi Writing Practice App (writing-practice)
-A simple and interactive application to help users practice writing in Farsi (Persian) using OCR technology.
+An interactive application (running on port 8008) to help users practice writing in Farsi (Persian). Provides English sentence prompts, verifies handwritten uploads using Tesseract OCR, and gives feedback using the Google Gemini API.
 
 **Key Features:**
 - 🔄 Random English sentences for translation practice
 - 📤 Upload and verify handwritten Farsi text
 - 👁️ Real-time OCR processing with Tesseract
-- ✅ Immediate feedback on translation accuracy
-- 🔣 Proper RTL (Right-to-Left) text display
+- ✨ AI-powered translation and grading feedback (via Google Gemini)
+- 🎨 Gradio web interface
+- 🔣 Proper RTL text display
 
 **Technical Stack:**
-- 🐍 Python 3.7+
+- 🐍 Python 3.10+
+- ✨ Gradio for web UI
+- 🧠 Google Generative AI (Gemini API)
 - 👁️ Tesseract-OCR with Persian language support
-- 🌐 Gradio for web interface
 - 🔣 Arabic-reshaper and python-bidi for text processing
-- 🖼️ Pillow and PyYAML
+- 🐳 Docker & Docker Compose
 
 ---
 
@@ -317,11 +328,34 @@ free-genai-bootcamp-2025/
 
 ## Getting Started
 
-Each project has its own requirements and setup instructions in its respective directory.
+This project uses Docker Compose to manage and run all the different services.
 
-For the Farsi MUD game:
-```bash
-cd fa-mud
-pip install -r requirements.txt
-python run_game.py
-```
+1.  **Prerequisites:**
+    *   Install [Docker](https://docs.docker.com/get-docker/).
+    *   Install [Docker Compose](https://docs.docker.com/compose/install/) (often included with Docker Desktop).
+    *   Ensure you have any necessary API keys (e.g., `GOOGLE_API_KEY` for Writing Practice) and potentially accounts for services like Azure Speech (for Listening Comp).
+
+2.  **Configuration:**
+    *   Navigate to the `Launcher` directory.
+    *   Create a `.env` file by copying `.env.template` (`cp .env.template .env`).
+    *   Edit the `.env` file and add your required API keys (e.g., `GOOGLE_API_KEY=YOUR_KEY_HERE`).
+
+3.  **Build and Run All Services:**
+    *   From the `Launcher` directory, run:
+        ```bash
+        docker-compose up -d
+        ```
+    *   This command will build the images for all services (which might take some time on the first run) and start them in the background.
+
+4.  **Access the Launcher Dashboard:**
+    *   Open your web browser to `http://localhost:3000`.
+    *   This dashboard shows the status of each service and provides links to launch them.
+
+5.  **Launch Projects:**
+    *   Click the "Launch" link for a project on the dashboard.
+    *   This will open the project's specific URL (e.g., `http://localhost:8008` for Writing Practice) in a new tab.
+
+6.  **Managing Services:**
+    *   To stop all services: `docker-compose down` (from the `Launcher` directory).
+    *   To start/stop individual services: `docker-compose start <service_name>` or `docker-compose stop <service_name>`.
+    *   To view logs: `docker-compose logs <service_name>`.
