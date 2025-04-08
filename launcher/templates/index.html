@@ -6,24 +6,38 @@
     <title>GenAI Learning Platform Launcher</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Add Google Font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #f8fafc;
+            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            -webkit-font-smoothing: antialiased; /* Add font smoothing */
+            -moz-osx-font-smoothing: grayscale;
         }
         .card {
-            transition: transform 0.2s ease-in-out;
+            /* Ensure rounded corners via Tailwind class below */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s ease-in-out;
+            /* Add border for outline effect later */
+            border: 1px solid transparent; 
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: scale(1.04); /* Slightly more scale */
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.18); /* Indigo glow */
+            /* Add outline on hover */
+            border-color: rgba(79, 70, 229, 0.3); /* Subtle indigo outline */
         }
         .launch-link {
-            display: inline-block; /* Allow padding and centering */
+            display: inline-block;
             text-align: center;
             background-color: #22c55e;
             color: white;
-            padding: 0.5rem 1rem; /* Equivalent to py-2 px-4 */
-            border-radius: 0.5rem; /* Equivalent to rounded-lg */
-            font-weight: 500; /* Equivalent to font-medium */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
             width: 100%;
             text-decoration: none;
             transition: background-color 0.2s ease-in-out;
@@ -33,7 +47,7 @@
             color: white;
         }
         .illustration-icon {
-            font-size: 6rem;
+            font-size: 5rem; /* Slightly smaller */
             transition: transform 0.3s ease;
         }
         .card:hover .illustration-icon {
@@ -93,6 +107,30 @@
         .project-header:hover {
             opacity: 0.8;
         }
+        /* Refined Status Badge Styles */
+        .status-badge {
+            position: absolute;
+            top: 0.5rem; /* Equivalent to top-2 */
+            right: 0.5rem; /* Equivalent to right-2 */
+            color: white;
+            font-size: 0.75rem; /* Equivalent to text-xs */
+            padding-left: 0.5rem; /* Equivalent to px-2 */
+            padding-right: 0.5rem;
+            padding-top: 0.25rem; /* Equivalent to py-1 */
+            padding-bottom: 0.25rem;
+            border-radius: 9999px; /* Equivalent to rounded-full */
+            display: flex;
+            align-items: center;
+        }
+        .status-badge .icon {
+            margin-right: 0.25rem; /* Equivalent to mr-1 */
+        }
+        .status-running {
+            background-color: #10b981; /* Tailwind green-500 */
+        }
+        .status-stopped {
+            background-color: #6b7280; /* Tailwind gray-500 */
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -126,22 +164,26 @@
     <!-- Main Content -->
     <div class="main-content p-8">
         <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <!-- Grid with increased gap -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {% for project_id, project in projects.items() %}
-                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden">
+                <!-- Add title attribute for tooltip and ensure rounded-2xl is present -->
+                <div class="card bg-white rounded-2xl shadow-lg overflow-hidden" title="{{ project.description }}">
                     <div class="bg-{{ project.color }}-100 p-6 flex justify-center items-center h-48 relative">
                         <i class="fas {{ project.icon }} illustration-icon text-{{ project.color }}-500"></i>
+                        <!-- Updated Status Badge -->
                         {% if container_status.get(project_id, False) %}
-                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-check-circle mr-1"></i>Running
+                        <div class="status-badge status-running">
+                            <i class="fas fa-check-circle icon"></i>Running
                         </div>
                         {% else %}
-                        <div class="absolute top-2 right-2 bg-gray-500 text-white text-xs px-2 py-1 rounded-full">
-                            <i class="fas fa-stop-circle mr-1"></i>Stopped
+                        <div class="status-badge status-stopped">
+                            <i class="fas fa-stop-circle icon"></i>Stopped
                         </div>
                         {% endif %}
                     </div>
                     <div class="p-6">
+                        <!-- Make title slightly bolder -->
                         <h2 class="text-xl font-semibold text-gray-800 mb-4">{{ loop.index }}️⃣ {{ project.name }}</h2>
                         <a href="{{ project.external_url }}" target="_blank" class="launch-link">
                             Launch
@@ -151,14 +193,14 @@
                 {% endfor %}
             </div>
 
-            <!-- Add the image below the cards -->
-            <div class="mt-12 flex justify-center items-center space-x-4">
+            <!-- Logo Section - reduced top margin -->
+            <div class="mt-8 flex justify-center items-center space-x-4">
                 <!-- Sparkle Left -->
-                <img src="/static/sparkle.png" alt="Sparkle" class="w-12 h-12 md:w-16 md:h-16">
+                <img src="/static/sparkle.png" alt="Sparkle" class="w-12 h-12 md:w-16 md:h-16 opacity-80">
                 <!-- Logo -->
                 <img src="/static/bootcamp_logo.png" alt="Free GenAI Bootcamp Logo" class="max-w-xs sm:max-w-sm md:max-w-md h-auto rounded-lg shadow-md">
                 <!-- Sparkle Right -->
-                <img src="/static/sparkle.png" alt="Sparkle" class="w-12 h-12 md:w-16 md:h-16">
+                <img src="/static/sparkle.png" alt="Sparkle" class="w-12 h-12 md:w-16 md:h-16 opacity-80">
             </div>
 
         </div>
@@ -174,7 +216,7 @@
         document.addEventListener('click', function(event) {
             const sidebar = document.querySelector('.sidebar');
             const sidebarToggle = document.getElementById('sidebarToggle');
-
+            
             if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
@@ -184,7 +226,7 @@
         function toggleDescription(projectIndex) {
             const description = document.querySelector(`.project-description[data-project="${projectIndex}"]`);
             const icon = document.querySelector(`.toggle-icon[data-project="${projectIndex}"]`);
-
+            
             description.classList.toggle('active');
             icon.classList.toggle('active');
         }

@@ -26,22 +26,43 @@ Launcher/
 
 ## Setup & Usage (Docker Compose)
 
-This launcher is intended to be run using Docker Compose alongside the other project services.
+This launcher service is part of the multi-container setup defined in `docker-compose.yml`.
 
-1.  **Prerequisites:** Ensure Docker and Docker Compose are installed on your system.
-2.  **Environment Variables:** Create a `.env` file in this `Launcher` directory (you can copy `.env.template`) and add any necessary API keys (like `GOOGLE_API_KEY` if required by other services managed indirectly).
-3.  **Run All Services:** From this `Launcher` directory, start all defined services:
-```bash
-    docker-compose up -d
-    ```
-4.  **Access Launcher:** Open your browser to `http://localhost:3000`.
-5.  **Access Projects:** Click the "Launch" link on a project card to open its specific URL (e.g., `http://localhost:8008` for Writing Practice) in a new tab. This only works if the corresponding service container is running.
-6.  **Manage Services:** Use your terminal in the `Launcher` directory to manage individual services:
-    *   `docker compose ps` (View status of all services)
-    *   `docker compose start <service_name>` (e.g., `docker compose start writing-practice`)
-    *   `docker compose stop <service_name>` (e.g., `docker compose stop writing-practice`)
-    *   `docker compose logs <service_name>` (View logs for a service)
-    *   `docker compose down` (Stop and remove all containers)
+1.  **Prerequisites:**
+    *   Ensure Docker and Docker Compose (or `docker compose` plugin) are installed on your system.
+
+2.  **Environment Variables:**
+    *   Navigate to the `Launcher` directory.
+    *   Create a `.env` file if it doesn't exist (you can copy `.env.template`).
+    *   Add any necessary API keys required by *other* services in the `.env` file (e.g., `GOOGLE_API_KEY=...`). The launcher itself doesn't need specific keys, but the compose file loads this `.env` for all services.
+
+3.  **Build & Run All Services (Including Launcher):**
+    *   Make sure you are in the `Launcher` directory in your terminal.
+    *   Run the following command:
+        ```bash
+        docker-compose up -d
+        ```
+    *   This command performs several actions:
+        *   Builds the Docker image for the `launcher` service (and any other services that haven't been built).
+        *   Creates and starts containers for **all** services defined in `docker-compose.yml`, including the `launcher`.
+        *   The `-d` flag runs the containers in detached mode (in the background).
+
+4.  **Access the Launcher Dashboard:**
+    *   Once the containers are running, open your web browser and navigate to:
+        `http://localhost:3000`
+    *   The dashboard will display the status (Running/Stopped) of the other project containers and provide direct links to access them.
+
+5.  **Managing Other Services:**
+    *   Use your terminal (in the `Launcher` directory) to manage the lifecycle of the other project containers (start, stop, view logs) using standard `docker compose` commands as needed:
+        *   `docker compose stop <service_name>`
+        *   `docker compose start <service_name>`
+        *   `docker compose logs <service_name>`
+
+6.  **Stopping Everything:**
+    *   To stop and remove all containers defined in the compose file (including the launcher), run:
+        ```bash
+        docker-compose down
+        ```
 
 ## Technical Details
 

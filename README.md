@@ -328,7 +328,9 @@ free-genai-bootcamp-2025/
 
 ## Getting Started
 
-This project uses Docker Compose to manage and run all the different services.
+This project uses Docker Compose to manage and run all the different services. The **Launcher service** (`http://localhost:3000`) acts as the central dashboard to view the status of and access all the other learning applications.
+
+**It is recommended to run all projects via the Launcher's Docker Compose setup.**
 
 1.  **Prerequisites:**
     *   Install [Docker](https://docs.docker.com/get-docker/).
@@ -336,13 +338,13 @@ This project uses Docker Compose to manage and run all the different services.
     *   Ensure you have any necessary API keys (e.g., `GOOGLE_API_KEY` for Writing Practice) and potentially accounts for services like Azure Speech (for Listening Comp).
 
 2.  **Configuration:**
-    *   Navigate to the `Launcher` directory.
+    *   **Navigate to the `Launcher` directory.** This is the main directory for controlling all services.
     *   Create a `.env` file by copying `.env.template` (`cp .env.template .env`).
-    *   Edit the `.env` file and add your required API keys (e.g., `GOOGLE_API_KEY=YOUR_KEY_HERE`).
+    *   Edit the `Launcher/.env` file and add your required API keys (e.g., `GOOGLE_API_KEY=YOUR_KEY_HERE`). This file provides environment variables to all services started by the compose file.
 
 3.  **Build and Run All Services:**
-    *   From the `Launcher` directory, run:
-```bash
+    *   **From the `Launcher` directory,** run:
+        ```bash
         docker-compose up -d
         ```
     *   This command will build the images for all services (which might take some time on the first run) and start them in the background.
@@ -352,10 +354,11 @@ This project uses Docker Compose to manage and run all the different services.
     *   This dashboard shows the status of each service and provides links to launch them.
 
 5.  **Launch Projects:**
-    *   Click the "Launch" link for a project on the dashboard.
+    *   From the Launcher Dashboard, click the "Launch" link for a project.
     *   This will open the project's specific URL (e.g., `http://localhost:8008` for Writing Practice) in a new tab.
 
 6.  **Managing Services:**
-    *   To stop all services: `docker-compose down` (from the `Launcher` directory).
+    *   **Use your terminal in the `Launcher` directory** to manage the services:
+    *   To stop all services: `docker-compose down`.
     *   To start/stop individual services: `docker-compose start <service_name>` or `docker-compose stop <service_name>`.
     *   To view logs: `docker-compose logs <service_name>`.
