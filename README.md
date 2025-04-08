@@ -24,6 +24,7 @@ This repository contains projects developed during the 2025 GenAI Bootcamp, focu
 *This architecture diagram illustrates our approach to building a cost-effective, privacy-focused AI system for language learning. We've designed this solution around open-source models (like IBM Granite) that can run on dedicated AI hardware, avoiding ongoing API costs while maintaining control over student data. The system supports 300 simultaneous users and integrates our own proprietary learning materials to address copyright concerns. This self-hosted approach offers the perfect balance of performance, privacy, and long-term sustainability for language education.*
 
 ![alt text](image.png)
+[Launcher Demo Video](.\free-genai-bootcamp-2025\Launchershow.mp4) (download to view)
 
 ## 📅 Weekly Development Progress
 
