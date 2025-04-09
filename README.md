@@ -5,7 +5,7 @@
   
   ***Learn, Code, Create: Transforming Language Learning with AI***
   
-  ![Visitors](https://img.shields.io/badge/dynamic/json?color=informational&label=visitors&query=value&url=https://api.countapi.xyz/hit/freegenibootcamp/visits)
+  ![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fajmalrasouli%2Ffree-genai-bootcamp-2025&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
   ![Weeks](https://img.shields.io/badge/Duration-6%20Weeks-brightgreen)
   ![Projects](https://img.shields.io/badge/Projects-8-orange)
   ![Focus](https://img.shields.io/badge/Focus-Persian%2FDari-blue)
