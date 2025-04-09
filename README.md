@@ -250,13 +250,18 @@ An interactive application (running on port 8008) to help users practice writing
 *The listening comprehension tool analyzes Persian audio and provides vocabulary extraction and grammar pattern recognition.*
 
 ### 5. Text-to-Speech (TTS) Microservice (opea-comps)
+![TTS Microservice](opea-comps/reference_images/image0.png)
 ![TTS Microservice](opea-comps/reference_images/image1.png)
 ![TTS Microservice](opea-comps/reference_images/image2.png)
+<audio controls src="opea-comps/reference_images/thanks.wav">
+  Listen to TTS Microservice audio: <a href="opea-comps/reference_images/thanks.wav">thanks.wav</a>
+</audio>
 
 *The TTS microservice architecture demonstrates the containerized services working together to provide text-to-speech conversion.*
 
 ### 6. Farsi Song Vocabulary Generator (song-vocab)
 ![Song Vocabulary Generator](song-vocab/reference_images/image1.png)
+![Song Vocabulary Generator](song-vocab/reference_images/lyrics.png)
 *The song vocabulary tool searches for and analyzes Farsi lyrics to extract useful vocabulary for language learners.*
 
 ### 7. Farsi Learning Visual Novel (visual-novel)
