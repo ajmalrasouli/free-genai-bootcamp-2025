@@ -274,6 +274,7 @@ An interactive application (running on port 8008) to help users practice writing
 *The visual novel presents interactive scenarios with characters and dialogue choices to teach Farsi in context.*
 
 ### 8. Farsi Writing Practice App (writing-practice)
+![Writing Practice](writing-practice/reference_images/image0.png)
 ![Writing Practice](writing-practice/reference_images/image1.png)
 ![Writing Practice](writing-practice/reference_images/image2.png)
 ![Writing Practice](writing-practice/reference_images/image3.png)

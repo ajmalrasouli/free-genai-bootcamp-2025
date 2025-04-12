@@ -80,7 +80,7 @@ services:
       - "8006:8006"
     environment:
       # Add environment variable for the search API key
-      - SERP_API_KEY=65eb8e6392443806e5a176529e9991d2032e39b898ac9e3810e0e72d1a566584 # <-- REPLACE WITH YOUR ACTUAL KEY
+      - SERP_API_KEY=${SERP_API_KEY}  # Will be loaded from your local environment or .env file
     networks:
       - dari-network
     restart: unless-stopped
@@ -103,8 +103,8 @@ services:
     container_name: dari-writing-practice
     ports:
       - "8008:8008"
-   
-      
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}  # Will be loaded from your local environment or .env file
     networks:
       - dari-network
     restart: unless-stopped

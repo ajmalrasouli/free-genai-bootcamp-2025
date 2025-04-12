@@ -76,3 +76,8 @@ dist/
 # Allow package files
 !package.json
 !package-lock.json
+
+# Environment variables
+.env
+*.env
+.env.*
