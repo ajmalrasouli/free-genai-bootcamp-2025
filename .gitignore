@@ -26,7 +26,6 @@ instance/
 # Data Files
 data/
 *.csv
-*.json
 *.xml
 *.yaml
 *.h5
