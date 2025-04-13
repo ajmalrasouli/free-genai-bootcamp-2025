@@ -287,6 +287,12 @@ An interactive application (running on port 8008) to help users practice writing
 
 ---
 
+## Special Thanks
+
+Big thanks to Andrew Brown for providing the Free GenAI Bootcamp – an amazing resource that helped guide this project. [Free GenAI Bootcamp](https://genai.cloudprojectbootcamp.com/)
+
+---
+
 ## Repository Structure
 
 ```
