@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import path from 'path'; // Import path module
 import { fileURLToPath } from 'url'; // Import url module helpers
 // Import from database.ts now, but keep .js extension for NodeNext module resolution
-import { sequelize, Word, WordGroup, StudySession, WordReview, StudySessionAttributes } from './database.js';
+import { sequelize, Word, WordGroup, StudySession, WordReview, StudySessionAttributes, WordGroupAttributes } from './database.js';
 
 // Helper to get __dirname in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -23,13 +23,10 @@ app.use(cors({
 // Parse JSON bodies
 app.use(express.json());
 
-// --- Serve Static Client Files ---
-// Define the path to the client build directory
-const clientBuildPath = path.join(__dirname, '../../client/dist'); // Path relative to server/dist
-
-// Serve static files (JS, CSS, images, etc.)
-app.use(express.static(clientBuildPath));
-// --- End Static File Serving ---
+// --- REMOVED Static Client File Serving ---
+// const clientBuildPath = path.join(__dirname, '../../client/dist');
+// app.use(express.static(clientBuildPath));
+// --- End REMOVED Static File Serving ---
 
 
 // Initialize database
@@ -67,10 +64,40 @@ apiRouter.get('/', (req: Request, res: Response) => { // Add types
 });
 
 // Groups endpoint
-apiRouter.get('/groups', async (req: Request, res: Response) => { // Add types
+apiRouter.get('/groups', async (req: Request, res: Response) => {
   try {
-    const groups = await WordGroup.findAll();
-    res.json(groups);
+    // Modified query to include word count
+    const groups = await WordGroup.findAll({
+      attributes: {
+        include: [[
+          sequelize.fn('COUNT', sequelize.col('words.id')),
+          'wordCount'
+        ]]
+      },
+      include: [{
+        model: Word,
+        attributes: []
+      }],
+      group: ['WordGroup.id'],
+      order: [['name', 'ASC']]
+    });
+
+    // Ensure wordCount is treated as a number and handle typing
+    const groupsWithNumericCount = groups.map(group => {
+      // Assert the correct type for plainGroup, including the added wordCount
+      const plainGroup = group.get({ plain: true }) as WordGroupAttributes & { wordCount: string | number | null }; 
+      return {
+        id: plainGroup.id,
+        name: plainGroup.name,
+        description: plainGroup.description,
+        // Include timestamps if they exist and are needed
+        // createdAt: plainGroup.createdAt,
+        // updatedAt: plainGroup.updatedAt,
+        wordCount: parseInt(String(plainGroup.wordCount) || '0', 10)
+      };
+    });
+
+    res.json(groupsWithNumericCount);
   } catch (error) {
     console.error('Error fetching word groups:', error);
     res.status(500).json({ error: 'Failed to fetch word groups' });
@@ -313,13 +340,9 @@ apiRouter.post('/full_reset', async (req: Request, res: Response) => { // Add ty
 
 app.use('/api', apiRouter); // Mount API router
 
-// --- Serve index.html for SPA routing ---
-// This catch-all route should come AFTER API routes
-// It serves the main HTML file for any non-API, non-static file requests
-app.get('*', (req: Request, res: Response) => { // Add types
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
-});
-// --- End SPA Fallback ---
+// --- REMOVED Serve index.html for SPA routing ---
+// app.get('*'...) ...
+// --- End REMOVED SPA Fallback ---
 
 
 // Start server

@@ -1,21 +1,48 @@
-import { useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "wouter";
+import React, { useState, useRef, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRoute, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchJson, postJson } from "@/lib/api";
-// import { toast } from "sonner";
-import type { Word } from "@shared/schema";
+import { fetchJson, postJson, patchJson } from "@/lib/api";
+import { toast } from "sonner";
+
+// Define correct local Word interface
+interface Word {
+  id: number;
+  dari: string;
+  phonetic: string | null;
+  english: string;
+  notes: string | null;
+}
 
 export function FlashcardsPage() {
+  const queryClient = useQueryClient();
   const [, params] = useRoute("/study/flashcards/:groupId");
+  const [location] = useLocation();
   const groupId = params?.groupId;
+  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [sessionComplete, setSessionComplete] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showBack, setShowBack] = useState(false);
   const [isReviewed, setIsReviewed] = useState(false);
   const [reviewMessage, setReviewMessage] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const searchString = String(location.search || '');
+    const searchParams = new URLSearchParams(searchString);
+    const id = searchParams.get("sessionId");
+    if (id) {
+      setSessionId(parseInt(id, 10));
+      console.log("Flashcards session ID:", id);
+    } else {
+      console.error("Session ID missing from URL");
+      toast.error("Could not start flashcard session: Session ID is missing.");
+    }
+  }, [location]);
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["/api/words", groupId],
@@ -26,22 +53,77 @@ export function FlashcardsPage() {
 
   const word = words[currentIndex];
 
-  const reviewWord = async (mastered: boolean) => {
+  const endSession = async () => {
+    if (!sessionId) return;
     try {
-      if (!word) return;
-      
-      await postJson(`/words/${word.id}/review`, { mastered });
-      
-      setReviewMessage(mastered ? "Word marked as mastered! 🎉" : "You'll see this word again");
-      
-      setIsReviewed(true);
+      const score = words.length > 0 ? Math.round((correctCount / words.length) * 100) : 0;
+      await patchJson(`/study_sessions/${sessionId}`, {
+        score,
+        correctCount,
+        incorrectCount,
+        endTime: new Date().toISOString(),
+      });
+      setSessionComplete(true);
+      toast.success("Session complete! Progress saved.");
+      await queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+      console.log("Session ended and dashboard query invalidated");
     } catch (error) {
-      console.error("Error reviewing word:", error);
-      setReviewMessage("Failed to record review. Please try again.");
+      console.error("Error ending session:", error);
+      toast.error("Failed to save session progress.");
+    }
+  };
+
+  const reviewWord = async (mastered: boolean) => {
+    if (!word) return;
+    
+    // Record correct/incorrect for session stats
+    if (mastered) {
+      setCorrectCount(prev => prev + 1);
+      setReviewMessage("Correct! 🎉");
+    } else {
+      setIncorrectCount(prev => prev + 1);
+      setReviewMessage("Incorrect. Keep practicing!");
+    }
+    setIsReviewed(true);
+    
+    if (currentIndex === words.length - 1) {
+      const finalCorrectCount = mastered ? correctCount + 1 : correctCount;
+      const finalIncorrectCount = !mastered ? incorrectCount + 1 : incorrectCount;
+      const finalScore = words.length > 0 ? Math.round((finalCorrectCount / words.length) * 100) : 0;
+      
+      if (sessionId) {
+        try {
+          await patchJson(`/study_sessions/${sessionId}`, {
+            score: finalScore,
+            correctCount: finalCorrectCount,
+            incorrectCount: finalIncorrectCount,
+            endTime: new Date().toISOString(),
+          });
+          setSessionComplete(true);
+          toast.success("Session complete! Progress saved.");
+          await queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+          console.log("Session ended from reviewWord and dashboard query invalidated");
+        } catch (error) {
+          console.error("Error ending session from reviewWord:", error);
+          toast.error("Failed to save session progress.");
+        }
+      }
     }
   };
 
   const goToNextCard = () => {
+    if (sessionComplete) {
+      toast.info("Session finished. Click 'Next Card' again to restart or navigate away.");
+      setCurrentIndex(0);
+      setShowBack(false);
+      setIsReviewed(false);
+      setCorrectCount(0);
+      setIncorrectCount(0);
+      setSessionComplete(false);
+      setReviewMessage("");
+      return;
+    }
+    
     if (cardRef.current) {
       cardRef.current.classList.add("animate-flip-out");
       setTimeout(() => {
@@ -51,7 +133,6 @@ export function FlashcardsPage() {
         if (currentIndex < words.length - 1) {
           setCurrentIndex(prev => prev + 1);
         } else {
-          // Reset to first card if at the end
           setCurrentIndex(0);
         }
         
@@ -137,17 +218,17 @@ export function FlashcardsPage() {
                   {!showBack ? (
                     <div className="text-center">
                       <p className="text-3xl font-bold mb-2" dir="rtl">
-                        {word.dariWord}
+                        {word.dari}
                       </p>
-                      <p className="text-muted-foreground">{word.pronunciation}</p>
+                      <p className="text-muted-foreground">{word.phonetic}</p>
                     </div>
                   ) : (
                     <div className="text-center">
                       <p className="text-3xl font-bold mb-2">
-                        {word.englishTranslation}
+                        {word.english}
                       </p>
                       <p className="text-muted-foreground italic">
-                        {word.exampleSentence}
+                        {word.notes}
                       </p>
                     </div>
                   )}

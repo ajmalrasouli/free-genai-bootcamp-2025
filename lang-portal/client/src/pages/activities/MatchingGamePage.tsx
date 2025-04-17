@@ -1,11 +1,20 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useRoute } from "wouter";
+import React, { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRoute, useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchJson } from "@/lib/api";
-import type { Word } from "@shared/schema";
+import { fetchJson, patchJson } from "@/lib/api";
+import { toast } from "sonner";
+
+// Define correct local Word interface
+interface Word {
+  id: number;
+  dari: string;
+  phonetic: string | null;
+  english: string;
+  notes: string | null;
+}
 
 interface MatchingCard {
   id: number;
@@ -17,8 +26,11 @@ interface MatchingCard {
 }
 
 export function MatchingGamePage() {
+  const queryClient = useQueryClient();
   const [, params] = useRoute("/study/matching/:groupId");
+  const [location] = useLocation();
   const groupId = params?.groupId;
+  const [sessionId, setSessionId] = useState<number | null>(null);
   
   const [cards, setCards] = useState<MatchingCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -27,6 +39,19 @@ export function MatchingGamePage() {
   const [isComplete, setIsComplete] = useState(false);
 
   console.log("Matching Game for group:", groupId);
+
+  useEffect(() => {
+    const searchString = String(location.search || '');
+    const searchParams = new URLSearchParams(searchString);
+    const id = searchParams.get("sessionId");
+    if (id) {
+      setSessionId(parseInt(id, 10));
+      console.log("Matching game session ID:", id);
+    } else {
+      console.error("Session ID missing from URL");
+      toast.error("Could not start matching game: Session ID is missing.");
+    }
+  }, [location]);
 
   const { data: words = [], isLoading } = useQuery({
     queryKey: ["/api/words", groupId],
@@ -49,7 +74,7 @@ export function MatchingGamePage() {
         gameCards.push({
           id: word.id * 2,
           originalId: word.id,
-          content: word.dariWord,
+          content: word.dari,
           type: "dari",
           isFlipped: false,
           isMatched: false
@@ -59,7 +84,7 @@ export function MatchingGamePage() {
         gameCards.push({
           id: word.id * 2 + 1,
           originalId: word.id,
-          content: word.englishTranslation,
+          content: word.english,
           type: "english",
           isFlipped: false,
           isMatched: false
@@ -71,6 +96,35 @@ export function MatchingGamePage() {
       setCards(shuffledCards);
     }
   }, [words]);
+
+  useEffect(() => {
+    const endSession = async () => {
+      if (!sessionId) return;
+      const totalPairs = Math.min(words.length, 8);
+      const score = matches === totalPairs ? 100 : Math.round((matches / totalPairs) * 100);
+      const correctCount = matches;
+      const incorrectCount = Math.max(0, moves - matches);
+      
+      try {
+        await patchJson(`/study_sessions/${sessionId}`, {
+          score,
+          correctCount,
+          incorrectCount,
+          endTime: new Date().toISOString(),
+        });
+        toast.success("Game complete! Progress saved.");
+        await queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+        console.log("Matching game ended and dashboard query invalidated");
+      } catch (error) {
+        console.error("Error ending matching game session:", error);
+        toast.error("Failed to save game progress.");
+      }
+    };
+
+    if (isComplete) {
+      endSession();
+    }
+  }, [isComplete, sessionId, matches, moves, words, queryClient]);
 
   const handleCardClick = (cardId: number) => {
     // Ignore clicks if already matched or we already have 2 cards flipped

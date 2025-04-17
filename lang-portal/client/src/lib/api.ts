@@ -6,8 +6,9 @@ declare module 'vite/client' {
   }
 }
 
-// API base URL
-const API_BASE = 'http://localhost:8003/api';
+// API base URL - Use environment variable
+// Default to localhost for standalone development, but Docker build will override
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8003/api';
 
 // Mock data for Persian/Dari vocabulary
 const mockData = {
@@ -222,6 +223,40 @@ export async function postJson<T>(endpoint: string, data?: any): Promise<T> {
     throw new Error('API POST request failed');
   } catch (error) {
     console.error(`API POST request error: ${error}`);
+    throw error;
+  }
+}
+
+export async function patchJson<T>(endpoint: string, data?: any): Promise<T> {
+  const url = `${API_BASE}${formatEndpoint(endpoint)}`;
+  console.log(`Patching to: ${url}`, data);
+  
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH', // Use PATCH method
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: data ? JSON.stringify(data) : undefined,
+    });
+    
+    if (response.ok && response.headers.get('content-type')?.includes('application/json')) {
+      const responseData = await response.json();
+      console.log(`Response from PATCH ${url}:`, responseData);
+      return responseData;
+    }
+    
+    // Improved error handling
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`API PATCH request failed with status ${response.status}: ${errorText}`);
+        throw new Error(`API PATCH request failed: ${response.status} - ${errorText}`);
+    }
+    
+    throw new Error('API PATCH request failed or returned non-JSON');
+  } catch (error) {
+    console.error(`API PATCH request error: ${error}`);
     throw error;
   }
 }

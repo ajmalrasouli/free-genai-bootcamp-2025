@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -6,10 +7,10 @@ import { fetchJson } from "@/lib/api";
 // Define the Word type locally
 interface Word {
   id: number;
-  dariWord: string;
-  pronunciation: string;
-  englishTranslation: string;
-  exampleSentence: string;
+  dari: string;
+  phonetic: string | null;
+  english: string;
+  notes: string | null;
 }
 
 export function VocabularyPage() {
@@ -60,16 +61,16 @@ export function VocabularyPage() {
                 >
                   <div className="space-y-1">
                     <p className="text-xl font-medium" dir="rtl">
-                      {word.dariWord}
+                      {word.dari}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {word.pronunciation}
+                      {word.phonetic}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg">{word.englishTranslation}</p>
+                    <p className="text-lg">{word.english}</p>
                     <p className="text-sm text-muted-foreground" dir="rtl">
-                      {word.exampleSentence}
+                      {word.notes}
                     </p>
                   </div>
                 </div>

@@ -28,50 +28,50 @@ async function seedDatabase() {
     // Create words for each group
     const numbers = await Promise.all([
       Word.create({
-        dariWord: 'یک',
-        pronunciation: 'yak',
-        englishTranslation: 'One',
-        exampleSentence: 'من یک کتاب دارم',
+        dari: 'یک',
+        phonetic: 'yak',
+        english: 'One',
+        notes: 'من یک کتاب دارم',
         groupId: wordGroups[0].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'دو',
-        pronunciation: 'do',
-        englishTranslation: 'Two',
-        exampleSentence: 'دو نفر آمدند',
+        dari: 'دو',
+        phonetic: 'do',
+        english: 'Two',
+        notes: 'دو نفر آمدند',
         groupId: wordGroups[0].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'سه',
-        pronunciation: 'se',
-        englishTranslation: 'Three',
-        exampleSentence: 'سه ساعت گذشت',
+        dari: 'سه',
+        phonetic: 'se',
+        english: 'Three',
+        notes: 'سه ساعت گذشت',
         groupId: wordGroups[0].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'چهار',
-        pronunciation: 'chahār',
-        englishTranslation: 'Four',
-        exampleSentence: 'چهار روز باقی مانده',
+        dari: 'چهار',
+        phonetic: 'chahār',
+        english: 'Four',
+        notes: 'چهار روز باقی مانده',
         groupId: wordGroups[0].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'پنج',
-        pronunciation: 'panj',
-        englishTranslation: 'Five',
-        exampleSentence: 'پنج دقیقه صبر کن',
+        dari: 'پنج',
+        phonetic: 'panj',
+        english: 'Five',
+        notes: 'پنج دقیقه صبر کن',
         groupId: wordGroups[0].id,
         masteryLevel: 1,
         correctCount: 0,
@@ -81,40 +81,40 @@ async function seedDatabase() {
 
     const familyMembers = await Promise.all([
       Word.create({
-        dariWord: 'پدر',
-        pronunciation: 'padar',
-        englishTranslation: 'Father',
-        exampleSentence: 'پدر من دکتر است',
+        dari: 'پدر',
+        phonetic: 'padar',
+        english: 'Father',
+        notes: 'پدر من دکتر است',
         groupId: wordGroups[1].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'مادر',
-        pronunciation: 'mādar',
-        englishTranslation: 'Mother',
-        exampleSentence: 'مادر من معلم است',
+        dari: 'مادر',
+        phonetic: 'mādar',
+        english: 'Mother',
+        notes: 'مادر من معلم است',
         groupId: wordGroups[1].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'برادر',
-        pronunciation: 'barādar',
-        englishTranslation: 'Brother',
-        exampleSentence: 'برادر من در دانشگاه درس می‌خواند',
+        dari: 'برادر',
+        phonetic: 'barādar',
+        english: 'Brother',
+        notes: 'برادر من در دانشگاه درس می‌خواند',
         groupId: wordGroups[1].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'خواهر',
-        pronunciation: 'khāhar',
-        englishTranslation: 'Sister',
-        exampleSentence: 'خواهر من مهندس است',
+        dari: 'خواهر',
+        phonetic: 'khāhar',
+        english: 'Sister',
+        notes: 'خواهر من مهندس است',
         groupId: wordGroups[1].id,
         masteryLevel: 1,
         correctCount: 0,
@@ -124,35 +124,80 @@ async function seedDatabase() {
 
     const basicPhrases = await Promise.all([
       Word.create({
-        dariWord: 'سلام',
-        pronunciation: 'salām',
-        englishTranslation: 'Hello',
-        exampleSentence: 'سلام، حال شما چطور است؟',
+        dari: 'سلام',
+        phonetic: 'salām',
+        english: 'Hello',
+        notes: 'سلام، حال شما چطور است؟',
         groupId: wordGroups[2].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'خوشحالم',
-        pronunciation: 'khoshhālam',
-        englishTranslation: 'I am well',
-        exampleSentence: 'من خوشحالم، ممنون',
+        dari: 'خوشحالم',
+        phonetic: 'khoshhālam',
+        english: 'I am well',
+        notes: 'من خوشحالم، ممنون',
         groupId: wordGroups[2].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       }),
       Word.create({
-        dariWord: 'ممنون',
-        pronunciation: 'mamnūn',
-        englishTranslation: 'Thank you',
-        exampleSentence: 'ممنون از کمک شما',
+        dari: 'ممنون',
+        phonetic: 'mamnūn',
+        english: 'Thank you',
+        notes: 'ممنون از کمک شما',
         groupId: wordGroups[2].id,
         masteryLevel: 1,
         correctCount: 0,
         incorrectCount: 0
       })
+    ]);
+
+    // Add words for Common Phrases (groupId: wordGroups[3].id)
+    const commonPhrases = await Promise.all([
+      Word.create({
+        dari: 'چطور هستی؟',
+        phonetic: 'chetor hasti?',
+        english: 'How are you?',
+        notes: 'A common greeting.',
+        groupId: wordGroups[3].id,
+        masteryLevel: 1,
+        correctCount: 0,
+        incorrectCount: 0
+      }),
+      Word.create({
+        dari: 'اسم شما چیست؟',
+        phonetic: 'esm-e shomā chist?',
+        english: 'What is your name?',
+        notes: '',
+        groupId: wordGroups[3].id,
+        masteryLevel: 1,
+        correctCount: 0,
+        incorrectCount: 0
+      }),
+      Word.create({
+        dari: 'بله',
+        phonetic: 'bale',
+        english: 'Yes',
+        notes: '',
+        groupId: wordGroups[3].id,
+        masteryLevel: 1,
+        correctCount: 0,
+        incorrectCount: 0
+      }),
+      Word.create({
+        dari: 'نخیر',
+        phonetic: 'na khair',
+        english: 'No',
+        notes: 'Formal way to say no.',
+        groupId: wordGroups[3].id,
+        masteryLevel: 1,
+        correctCount: 0,
+        incorrectCount: 0
+      })
+      // Add more common phrases here if needed
     ]);
 
     // Create initial study session
@@ -172,19 +217,19 @@ async function seedDatabase() {
         wordId: numbers[0].id,
         sessionId: studySession.id,
         isCorrect: true,
-        reviewTime: new Date('2025-04-01T18:05:00.000Z')
+        timestamp: new Date('2025-04-01T18:05:00.000Z')
       }),
       WordReview.create({
         wordId: numbers[1].id,
         sessionId: studySession.id,
         isCorrect: true,
-        reviewTime: new Date('2025-04-01T18:06:00.000Z')
+        timestamp: new Date('2025-04-01T18:06:00.000Z')
       }),
       WordReview.create({
         wordId: numbers[2].id,
         sessionId: studySession.id,
         isCorrect: true,
-        reviewTime: new Date('2025-04-01T18:07:00.000Z')
+        timestamp: new Date('2025-04-01T18:07:00.000Z')
       })
     ]);
 

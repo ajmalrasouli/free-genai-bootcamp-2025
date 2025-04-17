@@ -1,19 +1,52 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import React from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchJson } from "@/lib/api";
-import type { GroupWithCount } from "@shared/schema";
+import { fetchJson, postJson } from "@/lib/api";
+import { toast } from "sonner";
+
+interface GroupWithCount {
+  id: number;
+  name: string;
+  description: string | null;
+  wordCount?: number;
+}
+
+interface Session {
+  id: number;
+  groupId: number;
+  groupName: string;
+  startTime: string;
+}
 
 export function StudyPage() {
-  // Force refresh on mount
+  const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+
   const { data: groups = [], isLoading } = useQuery({
     queryKey: ["/api/groups"],
     queryFn: () => fetchJson<GroupWithCount[]>("/groups"),
     refetchOnMount: true,
     staleTime: 0
   });
+
+  const startSession = async (groupId: number, groupName: string, activityType: 'flashcards' | 'matching') => {
+    try {
+      console.log(`Starting ${activityType} session for group ${groupId} (${groupName})`);
+      const newSession = await postJson<Session>("/study_sessions", {
+        groupId,
+        groupName,
+      });
+      console.log("New session created:", newSession);
+      toast.success(`Started ${activityType} session for ${groupName}`);
+      setLocation(`/study/${activityType}/${groupId}?sessionId=${newSession.id}`);
+    } catch (error) {
+      console.error("Error starting session:", error);
+      toast.error("Failed to start study session. Please try again.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -85,11 +118,14 @@ export function StudyPage() {
               </p>
               <div className="grid gap-4">
                 {groups.map((group) => (
-                  <Link key={group.id} href={`/study/flashcards/${group.id}`}>
-                    <Button variant="outline" className="w-full h-12 text-lg">
-                      {group.name} ({group.wordCount} words)
-                    </Button>
-                  </Link>
+                  <Button 
+                    key={`${group.id}-flashcards`}
+                    variant="outline" 
+                    className="w-full h-12 text-lg"
+                    onClick={() => startSession(group.id, group.name, 'flashcards')}
+                  >
+                    {group.name} ({group.wordCount || 0} words)
+                  </Button>
                 ))}
               </div>
             </div>
@@ -108,11 +144,14 @@ export function StudyPage() {
               </p>
               <div className="grid gap-4">
                 {groups.map((group) => (
-                  <Link key={group.id} href={`/study/matching/${group.id}`}>
-                    <Button variant="outline" className="w-full h-12 text-lg">
-                      {group.name} ({group.wordCount} words)
-                    </Button>
-                  </Link>
+                   <Button 
+                    key={`${group.id}-matching`}
+                    variant="outline" 
+                    className="w-full h-12 text-lg"
+                    onClick={() => startSession(group.id, group.name, 'matching')}
+                  >
+                    {group.name} ({group.wordCount || 0} words)
+                  </Button>
                 ))}
               </div>
             </div>
@@ -132,19 +171,23 @@ export function StudyPage() {
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
                   <p className="text-muted-foreground mb-4">
-                    {group.wordCount} words
+                    {group.wordCount || 0} words
                   </p>
                   <div className="flex gap-2">
-                    <Link href={`/study/flashcards/${group.id}`}>
-                      <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => startSession(group.id, group.name, 'flashcards')}
+                    >
                         Flashcards
-                      </Button>
-                    </Link>
-                    <Link href={`/study/matching/${group.id}`}>
-                      <Button variant="outline" size="sm">
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => startSession(group.id, group.name, 'matching')}
+                    >
                         Matching
-                      </Button>
-                    </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

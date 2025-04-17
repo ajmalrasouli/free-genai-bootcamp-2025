@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,12 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchJson } from "@/lib/api";
-import type { Dashboard } from "@shared/schema";
+
+// Define local interfaces based on actual API response
+interface Word {
+  id: number;
+  dari: string;
+  phonetic: string | null;
+  english: string;
+  notes: string | null;
+  groupId?: number; // Include if needed
+}
+
+interface StudySession {
+  id: number;
+  groupId: number;
+  groupName: string;
+  startTime: string; // API returns string dates
+  endTime: string | null;
+  score: number | null;
+  correctCount: number | null;
+  incorrectCount: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface DashboardData {
+  lastStudySession: StudySession | null;
+  progress: {
+    totalWords: number;
+    masteredWords: number;
+    masteryProgress: number;
+  };
+  stats: {
+    totalWords: number;
+    totalGroups: number;
+    activeGroups: number;
+    totalSessions: number;
+    successRate: number;
+    studyStreak: number;
+  };
+  recentSessions: StudySession[];
+  recentWords: Word[];
+}
 
 export function DashboardPage() {
   const { data: dashboard, isLoading } = useQuery({
     queryKey: ["/api/dashboard"],
-    queryFn: () => fetchJson<Dashboard>('/dashboard')
+    queryFn: () => fetchJson<DashboardData>('/dashboard')
   });
 
   if (isLoading || !dashboard) {
@@ -20,8 +62,8 @@ export function DashboardPage() {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
             <Card key={i}>
               <CardContent className="p-6">
                 <Skeleton className="h-6 w-full mb-4" />
@@ -43,7 +85,7 @@ export function DashboardPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Last Study Session */}
         <Card>
           <CardHeader>
@@ -63,7 +105,7 @@ export function DashboardPage() {
                   {new Date(dashboard.lastStudySession.startTime).toLocaleDateString()}
                 </p>
                 <Button variant="link" asChild className="mt-2 px-0">
-                  <Link href={`/vocabulary/${dashboard.lastStudySession.groupId}`}>
+                  <Link href={`/groups/${dashboard.lastStudySession.groupId}/words`}>
                     View Group →
                   </Link>
                 </Button>
@@ -127,6 +169,30 @@ export function DashboardPage() {
                 <dd className="font-medium">{dashboard.stats.studyStreak} days</dd>
               </div>
             </dl>
+          </CardContent>
+        </Card>
+
+        {/* Recently Added Words */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <span className="i-lucide-list-plus h-5 w-5" />
+              Recent Words
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {dashboard.recentWords && dashboard.recentWords.length > 0 ? (
+              <ul className="space-y-2">
+                {dashboard.recentWords.map((word) => (
+                  <li key={word.id} className="flex justify-between items-center text-sm">
+                    <span className="font-medium" dir="rtl">{word.dari}</span>
+                    <span className="text-muted-foreground">{word.english}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">No recent words found.</p>
+            )}
           </CardContent>
         </Card>
       </div>

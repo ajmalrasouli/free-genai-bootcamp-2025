@@ -3,31 +3,22 @@ version: '3.8'
 services:
   api:
     build:
-      context: .
-    container_name: lang-portal-api
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: lang-portal-api-prod
     ports:
       - "8003:8003"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/client/node_modules
-      - /app/server/node_modules
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
     restart: unless-stopped
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: lang-portal-client
+    container_name: lang-portal-client-prod
     ports:
-      - "5173:5173"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-    environment:
-      - NODE_ENV=development
+      - "80:80"
     restart: unless-stopped
     depends_on:
       - api

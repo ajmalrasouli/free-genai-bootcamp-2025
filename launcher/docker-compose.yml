@@ -11,6 +11,7 @@ services:
     environment:
       - NODE_ENV=development
     volumes:
+      - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - dari-network
@@ -38,16 +39,38 @@ services:
       - dari-network
     restart: unless-stopped
 
-  lang-portal:
+  # Removed the old single lang-portal service
+
+  # Added lang-portal API service (backend)
+  lang-portal-api:
     build:
-      context: ../lang-portal
+      context: ../lang-portal/server
       dockerfile: Dockerfile
-    container_name: dari-lang-portal
+    container_name: dari-lang-portal-api-prod # Unique name
     ports:
       - "8003:8003"
+    environment:
+      - NODE_ENV=production
     networks:
       - dari-network
     restart: unless-stopped
+
+  # Added lang-portal Client service (frontend)
+  lang-portal-client:
+    build:
+      context: ../lang-portal/client
+      dockerfile: Dockerfile # Uses the production Nginx Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: dari-lang-portal-client-prod # Unique name
+    ports:
+      # Expose Nginx port 80 on host port 8009 (or choose another free port)
+      - "8009:80"
+    networks:
+      - dari-network
+    restart: unless-stopped
+    depends_on:
+      - lang-portal-api # Depends on the backend API
 
   listening-comp:
     build:
@@ -109,31 +132,28 @@ services:
       - dari-network
     restart: unless-stopped
 
-  # -- Added TTS Service Definition --
-  tts-service:
-    image: ghcr.io/coqui-ai/tts-cpu:latest
-    container_name: phcr_tts-microservice # Renamed slightly to avoid potential conflict if run separately
-    ports:
-      - "5005:5002" # Map internal 5002 to host 5005
-    volumes:
-      - ./models:/root/.local/share/tts # Persist downloaded models
-    environment:
-      # Revert to English model
-      - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
-    # Using the entrypoint and command separately
-    entrypoint: [ "python", "-m", "TTS.server.server" ]
-    # Revert to English model
-    command: [ "--model_name", "tts_models/en/ljspeech/tacotron2-DDC", "--port", "5002" ]
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
-    networks:
-      - dari-network # Connect to the shared network
-    restart: unless-stopped
-  # -- End Added TTS Service --
+  # -- Commenting out TTS Service temporarily to resolve Docker mount error --
+  # tts-service:
+  #   image: ghcr.io/coqui-ai/tts-cpu:latest
+  #   container_name: phcr_tts-microservice
+  #   ports:
+  #     - "5005:5002"
+  #   volumes:
+  #     - ./models:/root/.local/share/tts # This volume caused the error
+  #   environment:
+  #     - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
+  #   entrypoint: [ "python", "-m", "TTS.server.server" ]
+  #   command: [ "--model_name", "tts_models/en/ljspeech/tacotron2-DDC", "--port", "5002" ]
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 2G
+  #       reservations:
+  #         memory: 1G
+  #   networks:
+  #     - dari-network
+  #   restart: unless-stopped
+  # -- End Commented TTS Service --
 
 networks:
   dari-network:

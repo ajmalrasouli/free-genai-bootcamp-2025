@@ -53,12 +53,12 @@ PROJECTS = { # Ensure this matches service names in docker-compose.yml
     },
     "lang-portal": {
         "name": "Language Learning Portal",
-        "port": 8003,
+        "port": 8009,
         "category": "language",
         "icon": "fa-language",
         "color": "indigo",
         "description": "Centralized platform for accessing language resources.",
-        "external_url": "http://localhost:8003"
+        "external_url": "http://localhost:8009"
     },
     "listening-comp": {
         "name": "Persian Learning Assistant",

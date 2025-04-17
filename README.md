@@ -23,8 +23,9 @@ This repository contains projects developed during the 2025 GenAI Bootcamp, focu
 
 *This architecture diagram illustrates our approach to building a cost-effective, privacy-focused AI system for language learning. We've designed this solution around open-source models (like IBM Granite) that can run on dedicated AI hardware, avoiding ongoing API costs while maintaining control over student data. The system supports 300 simultaneous users and integrates our own proprietary learning materials to address copyright concerns. This self-hosted approach offers the perfect balance of performance, privacy, and long-term sustainability for language education.*
 
-![alt text](image.png)
-[Launcher Demo Video](Launchershow.mp4) (download to view)
+
+## 🎬 Launcher Demo Video
+[![Watch the Launcher Demo Video on YouTube](Thumbnail.png)](https://youtu.be/ByqWKTdygaM)
 
 ## 📅 Weekly Development Progress
 
@@ -115,19 +116,17 @@ An interactive application that helps users learn and practice American Sign Lan
 - 🌐 Gradio-based web interface
 
 ### 3️⃣ Language Learning Portal (lang-portal)
-A comprehensive language learning platform with various activities and tools to help users learn new languages.
+A comprehensive language learning platform with various activities and tools to help users learn new languages. Accessed via port 8009 when run with the launcher.
 
 **Key Features:**
-- 🏫 Interactive language learning modules
-- 📈 Progress tracking
-- 🔐 User authentication
-- 🛣️ Customizable learning paths
+- 🏫 Interactive language learning modules (Flashcards, Matching Game)
+- 📈 Progress tracking (Dashboard, Session History)
+- 🐳 Separate Frontend (React/Vite/Nginx) and Backend (Node/Express/SQLite) services
+- 🎨 Responsive UI with Tailwind CSS and Shadcn/ui
 
 **Technical Stack:**
-- 🐍 Python backend
-- 🗃️ Database integration
-- 🌐 Web-based interface
-- 🔄 Task automation with Invoke
+- Frontend: React, Vite, TypeScript, Tailwind CSS, Shadcn/ui, Nginx (serving)
+- Backend: Node.js, Express, TypeScript, Sequelize, SQLite
 
 ### 4️⃣ Persian Learning Assistant (listening-comp)
 An interactive chat system for learning Persian with transcript analysis capabilities.
@@ -367,8 +366,8 @@ This project uses Docker Compose to manage and run all the different services. T
     *   This dashboard shows the status of each service and provides links to launch them.
 
 5.  **Launch Projects:**
-    *   From the Launcher Dashboard, click the "Launch" link for a project.
-    *   This will open the project's specific URL (e.g., `http://localhost:8008` for Writing Practice) in a new tab.
+    *   From the Launcher Dashboard, click the link for a project.
+    *   This will open the project's specific URL (e.g., `http://localhost:8009` for Language Learning Portal, `http://localhost:8008` for Writing Practice) in a new tab.
 
 6.  **Managing Services:**
     *   **Use your terminal in the `Launcher` directory** to manage the services:
