@@ -103,17 +103,20 @@ A text-based adventure game that helps users learn Farsi vocabulary through an i
 An interactive application that helps users learn and practice American Sign Language (ASL) finger spelling using computer vision and machine learning.
 
 **Key Features:**
-- 👋 Real-time hand tracking and gesture recognition
-- 🤟 ASL finger spelling detection and translation
-- 🏫 Interactive learning mode for practicing ASL alphabet
-- 📊 Performance feedback and accuracy metrics
-- 🖥️ User-friendly interface with webcam integration
+- 👋 Real-time hand tracking and gesture recognition using MediaPipe
+- 🤟 ASL finger spelling detection and prediction
+- 🖼️ Displays reference images for predicted letters (placeholders used for D-Z currently)
+- 🏫 Interactive learning and test modes for practicing the ASL alphabet
+- 📊 Performance feedback and accuracy metrics in test mode
+- 🖥️ User-friendly web interface with webcam integration
 
 **Technical Stack:**
-- 🖐️ Hand tracking using MediaPipe
-- 🧠 Custom TensorFlow model for gesture recognition
+- 🖐️ Hand tracking and landmark extraction using MediaPipe
+- 🧠 Custom scikit-learn model for gesture recognition (trained on collected landmarks)
 - 📷 Real-time image processing with OpenCV
 - 🌐 Gradio-based web interface
+
+*Note: For optimal performance, users should train the gesture recognition model using their own hand data by following the instructions in the `finger-spelling/README.md`.*
 
 ### 3️⃣ Language Learning Portal (lang-portal)
 A comprehensive language learning platform with various activities and tools to help users learn new languages. Accessed via port 8009 when run with the launcher.
@@ -225,7 +228,10 @@ An interactive application (running on port 8008) to help users practice writing
 ### 2. ASL Finger Spelling Application (finger-spelling)
 ![ASL Finger Spelling](finger-spelling/reference_images/dashboard.png)![ASL Finger Spelling](finger-spelling/reference_images/image1.png)
 ![ASL Finger Spelling](finger-spelling/reference_images/image2.png)![ASL Finger Spelling](finger-spelling/reference_images/image3.png)
-![ASL Finger Spelling](finger-spelling/reference_images/image4.png)*The ASL application uses computer vision to recognize hand gestures and translate them into letters, with a practice mode for learning.*
+![ASL Finger Spelling](finger-spelling/reference_images/image4.png)
+![ASL Finger Spelling](finger-spelling/reference_images/FingerSpelling.mp4)
+
+*The ASL application uses computer vision to recognize hand gestures and translate them into letters, with a practice mode for learning.*
 
 ### 3. Language Learning Portal (lang-portal)
 ![Language Portal](lang-portal/reference_images/dashboard.png)
@@ -348,6 +354,7 @@ This project uses Docker Compose to manage and run all the different services. T
     *   Install [Docker](https://docs.docker.com/get-docker/).
     *   Install [Docker Compose](https://docs.docker.com/compose/install/) (often included with Docker Desktop).
     *   Ensure you have any necessary API keys (e.g., `GOOGLE_API_KEY` for Writing Practice) and potentially accounts for services like Azure Speech (for Listening Comp).
+    *   Ability to run Python scripts locally for project-specific setup (e.g., training the ASL model in `finger-spelling` by following its README).
 
 2.  **Configuration:**
     *   **Navigate to the `Launcher` directory.** This is the main directory for controlling all services.

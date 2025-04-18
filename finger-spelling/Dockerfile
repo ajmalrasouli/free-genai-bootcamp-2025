@@ -27,6 +27,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code and change ownership
+# Note: If not using docker-compose volumes, ensure necessary files 
+# like 'asl_model.joblib' exist here before building the image.
 COPY . .
 RUN chown -R $USERNAME:$USERNAME /app
 

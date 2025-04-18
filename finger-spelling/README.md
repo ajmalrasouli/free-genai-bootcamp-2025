@@ -35,6 +35,28 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+## Training Your Own Model
+
+The pre-packaged application relies on a model (`asl_model.joblib`) trained on specific hand data. For best performance, you should generate your own dataset and train a model based on your hand, webcam, and lighting conditions.
+
+1.  **Collect Data:**
+    *   Run the data collection script from the `finger-spelling` directory:
+        ```bash
+        python collect_data.py
+        ```
+    *   Follow the on-screen prompts to record samples for each ASL letter. This will generate/append to the `asl_landmark_data.csv` file.
+
+2.  **Train Model:**
+    *   Once you have collected sufficient data (aim for 30-50 samples per letter), run the training script:
+        ```bash
+        python train_model_example.py
+        ```
+    *   This script reads `asl_landmark_data.csv` and outputs the trained model file `asl_model.joblib`.
+
+3.  **Important Notes:**
+    *   The files `asl_landmark_data.csv` and `asl_model.joblib` are specific to your setup and should **not** be committed to Git. Ensure they are listed in your `.gitignore` file.
+    *   **Docker Usage:** If you are running this application via the main project Launcher (`launcher/docker-compose.yml`), the necessary volumes are already configured. This means the `asl_landmark_data.csv` and `asl_model.joblib` files you generate locally in the `finger-spelling` directory will automatically be used by the containerized application.
+
 ## Usage
 
 1. Start the application:

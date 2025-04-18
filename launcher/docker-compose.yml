@@ -35,6 +35,10 @@ services:
     container_name: dari-finger-spelling
     ports:
       - "8002:8002"
+    volumes:
+      - ../finger-spelling/asl_model.joblib:/app/asl_model.joblib
+      - ../finger-spelling/asl_data.csv:/app/asl_data.csv
+      - ../finger-spelling/asl_app.log:/app/asl_app.log
     networks:
       - dari-network
     restart: unless-stopped
