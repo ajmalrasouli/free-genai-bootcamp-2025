@@ -20,7 +20,7 @@ An interactive application that helps users learn and practice American Sign Lan
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd finger-spelling
 ```
 

@@ -23,7 +23,7 @@ A modern web application for learning and practicing Dari language.
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd lang-portal
 ```
 
@@ -86,7 +86,7 @@ To run the application in development mode with hot-reloading:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd lang-portal
 
 # Start the development environment
@@ -106,7 +106,7 @@ To build and run the application in production mode:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd lang-portal
 
 # Start production containers

@@ -137,26 +137,17 @@ services:
     restart: unless-stopped
 
   # -- Commenting out TTS Service temporarily to resolve Docker mount error --
-  # tts-service:
-  #   image: ghcr.io/coqui-ai/tts-cpu:latest
-  #   container_name: phcr_tts-microservice
-  #   ports:
-  #     - "5005:5002"
-  #   volumes:
-  #     - ./models:/root/.local/share/tts # This volume caused the error
-  #   environment:
-  #     - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
-  #   entrypoint: [ "python", "-m", "TTS.server.server" ]
-  #   command: [ "--model_name", "tts_models/en/ljspeech/tacotron2-DDC", "--port", "5002" ]
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 2G
-  #       reservations:
-  #         memory: 1G
-  #   networks:
-  #     - dari-network
-  #   restart: unless-stopped
+  tts-service:
+    image: ghcr.io/coqui-ai/tts-cpu:latest
+    container_name: phcr_tts-microservice
+    ports:
+      - "5006:5002"
+    environment:
+      - MODEL_NAME=tts_models/en/ljspeech/tacotron2-DDC
+    command: ["python3", "-m", "TTS.server.server", "--host", "0.0.0.0", "--port", "5002"]
+    networks:
+      - dari-network
+    restart: unless-stopped
   # -- End Commented TTS Service --
 
 networks:

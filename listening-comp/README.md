@@ -51,7 +51,7 @@ An AI-powered learning platform that transforms YouTube content into interactive
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/persian-learning-assistant.git
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd persian-learning-assistant
 ```
 

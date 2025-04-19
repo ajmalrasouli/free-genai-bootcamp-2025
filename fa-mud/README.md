@@ -27,7 +27,7 @@ Farsi Text Adventure MUD is a single-player, text-based adventure game designed 
 ## **Installation** 
 1. **Clone the Repository**: 
    ```bash
-   git clone https://github.com/yourusername/farsi-mud.git
+   git clone https://github.com/ajmalrasouli/farsi-mud.git
    cd farsi-mud
    ```
 2. **Set Up a Virtual Environment**: 

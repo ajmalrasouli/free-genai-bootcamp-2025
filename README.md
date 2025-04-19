@@ -15,7 +15,7 @@
 
 ---
 
-This repository contains projects developed during the 2025 GenAI Bootcamp, focusing on practical applications of generative AI and language technologies, particularly for Persian/Dari language learning. All projects are designed to be run via Docker Compose from the central `Launcher` directory.
+This repository contains projects developed during the 2025 GenAI Bootcamp [Free GenAI Bootcamp](https://genai.cloudprojectbootcamp.com/), focusing on practical applications of generative AI and language technologies, particularly for Persian/Dari language learning. All projects are designed to be run via Docker Compose from the central `Launcher` directory.
 
 ## 🏗️ GenAI System Architecture
 

@@ -22,7 +22,7 @@ opea-comps/
 
 ### **1️⃣ Clone and Setup**
 ```bash
-git clone <repository-url>
+git clone https://github.com/ajmalrasouli/free-genai-bootcamp-2025
 cd opea-comps
 ```
 
