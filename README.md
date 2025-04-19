@@ -25,7 +25,7 @@ This repository contains projects developed during the 2025 GenAI Bootcamp [Free
 
 
 ## 🎬 Launcher Demo Video
-[![Watch the Launcher Demo Video on YouTube](Thumbnail.png)](https://youtu.be/ByqWKTdygaM)
+[![Watch the Launcher Demo Video on YouTube](Thumbnail.png)](https://youtu.be/X8bxv_mLoHE&ab)
 
 ## 📅 Weekly Development Progress
 
