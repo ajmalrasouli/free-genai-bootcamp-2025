@@ -251,6 +251,8 @@ An interactive application (running on port 8008) to help users practice writing
 ![Persian Learning Assistant](listening-comp/reference_images/Raw_Transcript.png)
 ![Persian Learning Assistant](listening-comp/reference_images/Structured_Data.png)
 [Visual Novel Demo Video](listening-comp/reference_images/Listening_Comp_Video.mp4) (download to view)
+### 🎬 Launcher Demo Video
+[![Watch the listening-comp Demo Video on YouTube](Thumbnail.png)](https://youtu.be/uMh1SHP28wY)
 
 *The listening comprehension tool analyzes Persian audio and provides vocabulary extraction and grammar pattern recognition.*
 
